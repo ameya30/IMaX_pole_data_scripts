@@ -1,0 +1,2257 @@
+;lib_wiener
+
+; Libreria con los codigos de las rutinas utilizadas para la
+; deconvolucion con un filtro de Wiener
+
+; Editado por: Jose A. Bonet
+; 2 de Septiembre de 2009.  Para la restauracion de las imagenes de IMaX
+
+;______________________________________________________________________________
+;______________________________________________________________________________
+;______________________________________________________________________________
+
+function datatype,var, flag0, descriptor=desc, help=hlp, Tname = tname
+ ;+
+; NAME: 
+;      DATATYPE()
+;
+; PURPOSE: 
+;      Returns the data type of a variable.
+;
+; EXPLANATION: 
+;      This routine returns the data type of a variable in a format specified
+;      by the optional flag parameter.    Can also be used to emulate, in 
+;      earlier versions of IDL, the SIZE(/TNAME) option introduced in V5.1.
+;
+;      This routine was originally derived from the JHUAPL library ***but has 
+;      diverged from the JHUAPL library for the newer data types.***  For this
+;      reason DATATYPE is no longer used in any other procedure in the IDL 
+;      Astronomy Library.
+; CALLING SEQUENCE         : 
+;      Result = DATATYPE( VAR  [, FLAG , /TNAME, /DESC ] )
+;
+; INPUTS: 
+;     VAR     = Variable to examine, no restrictions
+;
+; OPTIONAL INPUT PARAMETERS: 
+;     FLAG  = Integer between 0 and 3 giving the output format flag as 
+;             explained below.  The default is 0.
+;     /DESC = If set, then return a descriptor for the given variable.  If the
+;             variable is a scalar the value is returned as a string.  If it is
+;             an array a description is returned just like the HELP command 
+;             gives.  Ex:'
+;             IDL> print, datatype(fltarr(2,3,5),/desc) gives the string
+;                           'FLTARR(2,3,5)'
+;     /TNAME - If set, then returns a identical result to the use of the /TNAME
+;                keyword to the SIZE() function in IDL V5.2 and later.   
+;               Overrides the value of FLAG.
+;     /HELP    = If set, then a short explanation is printed out.
+;
+; OUTPUT PARAMETERS: 
+;       The result of the function is the either a string or integer giving the
+;       data type of VAR.  Depending on the value of FLAG or /TNAME, the result
+;       will be one of the values from the following table:
+;
+;      FLAG = 0       FLAG = 1       FLAG = 2    FLAG = 3      /TNAME
+;
+;      UND            Undefined        0          UND          UNDEFINED  
+;      BYT            Byte             1          BYT          BYTE
+;      INT            Integer          2          INT          INT
+;      LON            Long             3          LON          LONG
+;      FLO            Float            4          FLT          FLOAT
+;      DOU            Double           5          DBL          DOUBLE
+;      COM            Complex          6          COMPLEX      COMPLEX
+;      STR            String           7          STR          STRING
+;      STC            Structure        8          STC          STRUCT
+;      DCO            DComplex         9          DCOMPLEX     DCOMPLEX
+;      PTR            Pointer         10          PTR          POINTER
+;      OBJ            Object          11          OBJ          OBJREF
+;      UIN            UInt            12          UINT         UINT
+;      ULN            ULong           13          ULON         ULONG
+;      L64            Long64          14          LON64        LONG64
+;      U64            ULong64         15          ULON64       ULONG64
+;
+;
+; REVISION HISTORY: 
+;       Original Version: R. Sterner, JHU/APL, 24 October 1985.
+;       Major rewrite, add /TNAME keyword, unsigned and 64 bit datatypes
+;       W. Landsman   August 1999
+;       Zarro (SM&A/GSFC) - November 2001, replace error stops by continues
+;-
+;-------------------------------------------------------------
+ 
+ 
+        if (N_params() lt 1) or keyword_set(hlp) then begin
+          print,' Datatype of variable as a string (3 char or spelled out).'
+          print,' typ = datatype(var, [flag])'
+          print,'   var = variable to examine.         in'
+          print,'   flag = output format flag (def=0). in'
+          print,'   typ = datatype string or number.   out'
+          print,'      flag=0    flag=1      flag=2  flag=3      /TNAME'
+          print,'      UND       Undefined   0       UND         UNDEFINE'
+          print,'      BYT       Byte        1       BYT         BYTE'
+          print,'      INT       Integer     2       INT         INT'
+          print,'      LON       Long        3       LON         LONG'
+          print,'      FLO       Float       4       FLT         FLOAT'
+          print,'      DOU       Double      5       DBL         DOUBLE'
+          print,'      COM       Complex     6       COMPLEX     COMPLEX'
+          print,'      STR       String      7       STR         STRING'
+          print,'      STC       Structure   8       STC         STRUCT'
+          print,'      DCO       DComplex    9       DCOMPLEX    DCOMPLEX'
+          print,'      PTR       Pointer    10       PTR         POINTER'
+          print,'      OBJ       Object     11       OBJ         OBJREF'
+          print,'      UIN       UInt       12       UINT        UINT'
+          print,'      ULO       ULong      13       ULON        ULONG'
+          print,'      L64       Long64     14       LON64       LONG64'
+          print,'      U64       ULong64    15       ULON64      ULONG64'
+          print,' Keywords:'                                     
+          print,'  /TNAME - Identical output to SIZE(/TNAME) '
+          print,'  /DESCRIPTOR returns a descriptor for the given variable.'
+          print,'     If the variable is a scalar the value is returned as'
+          print,'     a string.  If it is an array a description is return'
+          print,'     just like the HELP command gives.  Ex:'
+          print,'     datatype(fltarr(2,3,5),/desc) gives'
+          print,'       FLTARR(2,3,5)  (flag always defaults to 3 for /DESC).'
+          return, -1
+        endif 
+ 
+ s_tname = ['UNDEFINE', 'BYTE','INT','LONG','FLOAT','DOUBLE','COMPLEX',$
+            'STRING','STRUCT','DCOMPLEX','POINTER','OBJREF','UINT','ULONG', $
+            'LONG64','ULONG64']
+
+ s_flag0 =  ['UND','BYT','INT','LON','FLO','DOU','COM','STR','STC','DCO','PTR',$
+             'OBJ','UIN','ULO','L64','U64']
+
+ s_flag1 = ['Undefined','Byte','Integer','Long','Float','Double','Complex', $
+            'String','Structure','DComplex','Pointer','Object','UInt','ULong',$
+            'Long64','ULong64']
+
+ s_flag3 = [ 'UND','BYT','INT','LON','FLT','DBL','COMPLEX','STR','STC', $
+            'DCOMPLEX','PTR','OBJ','UINT','ULON','LON64','ULON64']
+ 
+       s = size(var)
+       stype =  s[s[0]+1]
+        if stype GT N_elements(s_tname) then begin
+         message,'ERROR - Unrecognized IDL datatype',/cont
+         stype=0
+        endif
+
+        if keyword_set(TNAME) then return, s_tname[stype]          
+
+        if N_params() lt 2 then flag0 = 0      ; Default flag.
+        if keyword_set(desc) then flag0 = 3
+  
+       case flag0 of 
+ 
+  0: return, s_flag0[stype]
+  1: return, s_flag1[stype]
+  2: return, stype
+  3: typ = s_flag3[stype]
+  else: message,'ERROR - Flag parameter must be between 0 and 3'
+  endcase 
+  
+ if keyword_set(desc) then begin
+          if stype EQ 0 then begin
+           message,'ERROR - Input variable is undefined',/cont
+           return,'Undefined'
+          endif
+          if s[0] eq 0 then return,strtrim(var,2)       ; Return scalar desc.
+          aa = typ+'ARR('
+          for i = 1, s[0] do begin                      
+            aa = aa + strtrim(s[i],2)                 
+            if i lt s[0] then aa = aa + ','          
+            endfor                                     
+          aa = aa+')'                                   
+          return, aa
+        endif else return,typ
+ 
+   end
+
+;*********************************************************************************
+
+PRO statist,a
+;+
+; NAME:
+;	STATIST
+; PURPOSE:
+; Invokes IDL-routine "help",
+;	prints minimum, maximum, r.m.s., and arithmetic mean 
+;	of data.
+;*CATEGORY:            @CAT-# 33@
+;	Statistics
+; CALLING SEQUENCE:
+;	STATIST,data
+; INPUTS:
+;	data : 1- or more-dimensional array containing numerical
+;	       data.
+; OUTPUTS:
+;	none
+; COMMON BLOCKS:
+;	none
+; SIDE EFFECTS:
+;	print line to standard output.
+; RESTRICTIONS:
+;	none
+; PROCEDURE:
+;	straight (using IDL-routines help,min,max,stdev)
+; MODIFICATION HISTORY:
+;	nlte, 1990-03-17 
+;	nlte, 1992-02-05  on_error
+;-
+on_error,1
+help,a
+print,'min',min(a),' max',max(a),' rms',stdev(a,m),' mean',m
+return
+end
+
+;*******************************************************************************
+
+function nint, x, LONG = long             ;Nearest Integer Function
+;+
+; NAME:
+;	NINT
+; PURPOSE:
+;	Nearest integer function.
+; EXPLANATION:   
+;	NINT() is similar to the intrinsic ROUND function, with the following
+;	two differences:
+;	(1) if no absolute value exceeds 32767, then the array is returned as
+;		as a type INTEGER instead of LONG
+;	(2) NINT will work on strings, e.g. print,nint(['3.4','-0.9']) will
+;		give [3,-1]  
+;
+; CALLING SEQUENCE:
+;	result = nint( x, [ /LONG] )
+;
+; INPUT:
+;	X - An IDL variable, scalar or vector, usually floating or double
+;		Unless the LONG keyword is set, X must be between -32767.5 and 
+;		32767.5 to avoid integer overflow
+;
+; OUTPUT
+;	RESULT - Nearest integer to X
+;
+; OPTIONAL KEYWORD INPUT:
+;	LONG - If this keyword is set and non-zero, then the result of NINT
+;		is of type LONG.   Otherwise, the result is of type LONG if
+;		any absolute values exceed 32767, and type INTEGER if all
+;		all absolute values are less than 32767.
+; EXAMPLE:
+;	If X = [-0.9,-0.1,0.1,0.9] then NINT(X) = [-1,0,0,1]
+;
+; PROCEDURE CALL:
+;	DATATYPE()
+; REVISION HISTORY:
+;	Written W. Landsman        January 1989
+;	Added LONG keyword         November 1991
+;	Use ROUND if since V3.1.0  June 1993
+;	Always start with ROUND function    April 1995
+;	Return LONG values, if some input value exceed 32767
+;		and accept string values   February 1998 
+;-
+ xmax = max(x,min=xmin)
+ xmax = abs(xmax) > abs(xmin)
+ if (xmax gt 32767) or keyword_set(long) then begin
+    if datatype(x,1) eq 'String' then b = round(float(x)) else b = round(x)
+ end else begin
+    if datatype(x,1) eq 'String' then b = fix(round(float(x))) else	$
+	    b = fix(round(x))
+ endelse
+
+  return, b 
+  end
+
+;*****************************************************************************
+
+; $Id: stdev.pro,v 1.2 1997/01/15 04:02:19 ali Exp $
+;
+; Copyright (c) 1983-1997, Research Systems, Inc.  All rights reserved.
+;       Unauthorized reproduction prohibited.
+
+Function STDEV, Array, Mean
+;
+;+
+; NAME:
+;	STDEV
+;
+; PURPOSE:
+;	Compute the standard deviation and, optionally, the
+;	mean of any array.
+;
+; CATEGORY:
+;	G1- Simple calculations on statistical data.
+;
+; CALLING SEQUENCE:
+;	Result = STDEV(Array [, Mean])
+;
+; INPUTS:
+;	Array:	The data array.  Array may be any type except string.
+;
+; OUTPUTS:
+;	STDEV returns the standard deviation (sample variance
+;	because the divisor is N-1) of Array.
+;		
+; OPTIONAL OUTPUT PARAMETERS:
+;	Mean:	Upon return, this parameter contains the mean of the values
+;		in the data array.
+;
+; COMMON BLOCKS:
+;	None.
+;
+; SIDE EFFECTS:
+;	None.
+;
+; RESTRICTIONS:
+;	None.
+;
+; PROCEDURE:
+;	Mean = TOTAL(Array)/N_ELEMENTS(Array)
+;	Stdev = SQRT(TOTAL((Array-Mean)^2/(N-1)))
+;
+; MODIFICATION HISTORY:
+;	DMS, RSI, Sept. 1983.
+;-
+	on_error,2		;return to caller if error
+	n = n_elements(array)	;# of points.
+	if n le 1 then message, 'Number of data points must be > 1'
+;
+        mean = total(array)/n	;yes.
+        return,sqrt(total((array-mean)^2)/(n-1))
+
+       end
+
+;******************************************************************************
+
+FUNCTION ODD,A
+;+
+; NAME:
+;	ODD
+;
+; PURPOSE:
+;	Search for odd numbers in A.
+;
+; CALLING SEQUENCE:
+;	Result = ODD(A)
+;
+; INPUT:
+;	A = array of any size; type must be byte, integer or longword.
+;
+; OUTPUT:
+;	Result = a byte array of same size as A, filled with 1 and 0.
+;		 0 is even and 1 means odd.
+;
+; COMMON BLOCKS:
+;	None.
+;
+; SIDE EFFECTS:
+;	None.
+;
+; RESTRICTIONS:
+;	Input should be of byte, integer or longword integer type.
+;
+; PROCEDURE:
+;	Straightforward. Output = 1 is odd; 0 means even.
+;
+; MODIFICATION HISTORY:
+;	Written by Roberto Luis Molowny Horas, 1991.
+;-
+ON_ERROR,2
+
+	s = SIZE(a)
+	array_type = s(s(0)+1)
+	IF array_type NE 1 AND array_type NE 2 AND array_type NE 3 THEN $
+		MESSAGE,'Input must be byte, integer or longword integer'
+
+	dumb = a / 2.
+	RETURN,LONG(dumb) NE dumb	;Easy algorithm
+
+END
+
+;******************************************************************************************
+
+function especul,f
+
+; Given function f(x,y), returns function g(x,y)=f(-x,-y) in a
+; periodic discrete space. f(x,y) can be complex or real.
+
+
+; Programa editado el 16 de Marzo de 1999
+; Jose A. Bonet (transcripcion a idl del programa freverse_f.ana 
+;		en ana de M.L.)
+
+;--------------------------------------------------------------------------
+
+  g=f
+  g(*,1:*)=reverse(g(*,1:*),2)
+  g(1:*,*)=reverse(g(1:*,*),1)
+
+return,g
+
+end
+
+;******************************************************************************************
+
+function radius_aper2,r,rc,ap
+
+; Generate two masks, ap and rd, of dimensions 2r x 2r :
+
+;           rd = radius_aper2(r,rc,ap)      (where rc < r)
+
+; rc can be either integer or fractional. This represents an improvement with 
+; respect to the routine radius_aper.pro that only works with integer values.
+
+; ap = mask defining a circular aperture of radius rc, centered at pixel (r,r).
+;      The pixel value is 1 within the circle and 0 outside. Each pixel 
+;      intersected by rc gets a value that corresponds to the fractional 
+;      area of the inner portion of the pixel.
+
+; rd = mask defining the radial coordinate of the pixels in the aperture,
+;      normalized to rc. Each pixel intersected by rc gets a value that 
+;      corresponds to the normalized distance from the center to the 
+;      centroid of the inner portion of the pixel.
+
+; (See Apendix H)
+
+; Programa editado el 6 de Mayo de 1999 como una extension de radius_aper.pro
+; para el caso de rc = numero fraccionario o entero.
+; Jose A. Bonet
+
+;-----------------------------------------------------------------------------
+
+; Defines the first quadrant in both masks (first approach) 
+
+  rc=float(rc)     ;just in case
+  d = 2*r                          ; d x d is the final dimension of the masks.
+  rd = dist(d,d)
+  rd1 = rd(0:r-1,0:r-1)/rc
+  ap1 = rd1 le 1.  &  ap1=float(ap1)
+  rd1 = rd1*ap1
+
+; Define indices (i,j) of those pixels intersected by rc (first octant).
+
+  ii=nint(rc)
+  i = lonarr(2*ii)
+  j = i
+  jant = 0
+  npix = 0
+
+start:
+
+  xx = ii-0.5
+  jult = fix(sqrt(rc*rc-xx*xx)+0.5)
+  for k=jant,jult do begin
+    i(npix) = ii
+    j(npix) = k
+    if (i(npix) eq j(npix)) then goto,fin
+    npix = npix+1
+  endfor
+  ii = ii-1  
+  jant = jult
+  goto,start
+
+fin:
+
+  i = i(0:npix)
+  j = j(0:npix)
+
+;for h=0,npix do print,i(h),j(h)
+
+; Calculate de centroid and area of the inner portion of those pixels
+; intersected by rc (first octant).
+
+  for k=0,npix do begin       ; Absolute coord.system at center of pixel (0,0)
+
+    x0 = i(k)-0.5            ; absolute coords.of the lower left corner of pixel
+    y0 = j(k)-0.5            ; (i,j) ==> origin of the new coord. system OXY.
+    x1 = sqrt(rc*rc-y0*y0)-x0                ; (x1,y1), (x2,y2) coord. referred
+    y1 = 0                                   ; to OXY, of the intersections of 
+    x2 = 0                                   ; the circunference with the axis 
+    y2 = sqrt(rc*rc-x0*x0)-y0                ; OX and OY.
+
+    case 1 of
+      (x1 gt 0.) and (x1 le 1.) and (y2 le 1.): begin
+        xm = x1/3.  &  ym = y2/3.    ; Centroid coord. referred to OXY.
+        area = x1*y2/2.
+        xxm = x0+xm  &  yym = y0+ym  ; Centroid coord. referred to absolute axis
+        end
+      (x1 gt 0.) and (x1 le 1.) and (y2 gt 1.): begin
+        yup = y0+1.
+        x2 = sqrt(rc*rc-yup*yup)-x0  &  y2 = 1.
+        aa = x2  &  ab = (x1-x2)/2.  &  area = aa+ab
+        xa = x2/2.  &  ya = y2/2.
+        xb = x2+(x1-x2)/3.  &  yb = 1./3.
+        xm = (aa*xa+ab*xb)/area     ; Centroid coord. referred to OXY.
+        ym = (aa*ya+ab*yb)/area
+        xxm = x0+xm  & yym = y0+ym  ; Centroid coord. referred to absolute axis
+        end
+      (x1 gt 1.): begin
+        xup = x0+1.  &  yup = y0+1.
+        x1 = 1.  &  y1 = sqrt(rc*rc-xup*xup)-y0
+        x2 = sqrt(rc*rc-yup*yup)-x0  &  y2=1.
+        a = 1.  &  ab = (1.-y1)*(1.-x2)/2.  &  area = a-ab
+        x = 0.5  &  y=0.5
+        xb = x2+2.*(1.-x2)/3.  &  yb = y1+2.*(1.-y1)/3.
+        xxm = x0+(a*x-ab*xb)/area   ; Centroid coord. referred to absolute axis
+        yym = y0+(a*y-ab*yb)/area
+        end
+      (x1 le 0.): begin
+        area = 0.
+        xxm = 0.  &  yym = 0.
+        end
+    endcase
+
+; Define distance and aperture in those pixels intersect.by rc (first quadrant)
+
+    rd1(i(k),j(k)) = sqrt(xxm*xxm+yym*yym)/rc
+    rd1(j(k),i(k)) = rd1(i(k),j(k))
+    ap1(i(k),j(k)) = area
+    ap1(j(k),i(k)) = area
+
+  endfor
+
+; Centering of the masks in the center of the matrix (pixel (r,r)) and generate
+; the other three quadrants
+
+  rd = rd*0. & ap = rd
+  rd(r,r) = rd1 
+  rd(1,r) = reverse(rd(r+1:*,r:*),1)
+  rd(1,1) = reverse(rd(1:*,r+1:*),2)
+  ap(r,r) = ap1 
+  ap(1,r) = reverse(ap(r+1:*,r:*),1)
+  ap(1,1) = reverse(ap(1:*,r+1:*),2)
+
+
+;openw,1,'resultados'
+;  for m=0,npix do printf,1,i(m),j(m)
+;  for m=0,d-1 do begin
+;    printf,1,rd(*,m),format='(1x,10F7.4)'
+;  endfor
+;  printf,1,''
+;  for m=0,d-1 do begin
+;    printf,1,ap(*,m),format='(1x,10F7.4)'
+;  endfor
+;close,1
+
+
+return,rd
+
+end
+
+;*********************************************************************************************
+
+function radius_aper_annular,r,rc,e,ap_a
+
+; Generate two masks, ap_a and rd_a, of dimensions 2r x 2r :
+
+;         rd_a = radius_aper2N(r,rc,e,ap_a)   (where rc < r and 0 < e < 1)
+
+;INPUTS:
+;  r  = semi-dimension de las mascaras.
+;  rc = radio de la pupila en pixels. It can be either integer or fractional.
+;  e  = obscurecimiento central expresado como fraccion de "rc" (p.ej.: 0.25) 
+
+;OUTPUTS:
+; ap_a = mask defining a annular aperture with radius rc and rc*e, respectively,
+;        centered at pixel (r,r). 
+;        The pixel value is 1 within the annulus and 0 elsewhere. Each pixel
+;        intersected by los radios externo e interno, (rc or rc*e), gets a 
+;	 value that corresponds to the fractional area of the portion of 
+;	 the pixel inside the annulus.
+
+; rd_a = mask defining the radial coordinate of the pixels in the annular
+;        aperture, normalized to rc. Each pixel intersected by rc or rc*e 
+;        gets a value that corresponds to the normalized distance from the 
+;        center to the centroid of the portion of the pixel inside the 
+;        annulus.
+
+; (See Apendix H)
+
+;_________________________________________________________________________
+
+; Programa editado el 25 de Enero de 2004 como una organizacion y sintesis
+; de los programas radius_aper2N.pro y radius_aper_ANN.pro (de Dario del Moro)
+; en uno solo.
+; Se trata de una extension de radius_aper2.pro para el caso de calcular 
+; una pupila con un obscurecimiento central.
+; Jose A. Bonet
+
+;-----------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+
+; Test de input parametres
+
+  if (e le 0) or (e ge 1) then begin
+    print,'El valor de "e" no permite una pupila anular'
+    goto,finito
+
+ endif 
+
+; Crea la mascara de pupila anular por sustraccion de dos circulares
+; y prepara la mascara de distancias.
+
+  rd1 = radius_aper2(r,rc,ap1)
+  rd2 = radius_aper2(r,rc*e,ap2)
+
+  ap_a = ap1-ap2
+  rd_a = rd1
+  
+  ap1=0.  &  ap2=0.  &  rd1=0.
+
+;*********************************************************************
+;*********************************************************************
+
+; BLOQUE EN EL QUE SE TRATA EL BORDE INTERNO DE LA MASCARA ANULAR DE 
+; DISTANCIAS (PIXELS FRACCIONADOS EN BORDE INTERNO). Este bloque es una 
+; modificacion del programa radius_aper2.pro.
+
+;*********************************************************************
+
+; Defines the first quadrant in both masks (first approach) de radio rc*e
+
+  d = 2*r                          ; d x d is the final dimension of the masks.
+  rd = dist(d,d)
+  rd1 = rd(0:r-1,0:r-1)/(e*rc)
+  ap1 = rd1 le 1.  &  ap1=float(ap1)
+  rd1 = rd1*ap1
+
+
+; Define indices (i,j) of those pixels intersected by rc*e (first octant).
+
+  ii=nint(e*rc)
+  i = lonarr(2*ii)
+  j = i
+  jant = 0
+  npix = 0
+
+start:
+
+  xx = ii-0.5
+  jult = fix(sqrt(e*rc*e*rc-xx*xx)+0.5)
+  for k=jant,jult do begin
+    i(npix) = ii
+    j(npix) = k
+    if (i(npix) eq j(npix)) then goto,fin
+    npix = npix+1
+  endfor
+  ii = ii-1
+  jant = jult
+  goto,start
+
+fin:
+
+  i = i(0:npix)
+  j = j(0:npix)
+
+;for h=0,npix do print,i(h),j(h)
+
+; Calculate de centroid and area of the inner portion of those pixels
+; intersected by e*rc (first octant).
+
+  for k=0,npix do begin       ; Absolute coord.system at center of pixel (0,0)
+
+    x0 = i(k)-0.5            ; absolute coords.of the lower left corner of pixel
+    y0 = j(k)-0.5            ; (i,j) ==> origin of the new coord. system OXY.
+    x1 = sqrt(e*rc*e*rc-y0*y0)-x0                ; (x1,y1), (x2,y2) coord. referred
+    y1 = 0                                   ; to OXY, of the intersections of
+    x2 = 0                                   ; the circunference with the axis
+    y2 = sqrt(e*rc*e*rc-x0*x0)-y0                ; OX and OY.
+
+    case 1 of
+      (x1 gt 0.) and (x1 le 1.) and (y2 le 1.): begin
+        xm = x1/3.  &  ym = y2/3.    ; Centroid coord. referred to OXY.
+        area = x1*y2/2.
+        xxm = x0+xm  &  yym = y0+ym  ; Centroid coord. referred to absolute axis
+        end
+      (x1 gt 0.) and (x1 le 1.) and (y2 gt 1.): begin
+        yup = y0+1.
+        x2 = sqrt(e*rc*e*rc-yup*yup)-x0  &  y2 = 1.
+        aa = x2  &  ab = (x1-x2)/2.  &  area = aa+ab
+        xa = x2/2.  &  ya = y2/2.
+        xb = x2+(x1-x2)/3.  &  yb = 1./3.
+        xm = (aa*xa+ab*xb)/area     ; Centroid coord. referred to OXY.
+        ym = (aa*ya+ab*yb)/area
+        xxm = x0+xm  & yym = y0+ym  ; Centroid coord. referred to absolute axis
+        end
+      (x1 gt 1.): begin
+        xup = x0+1.  &  yup = y0+1.
+        x1 = 1.  &  y1 = sqrt(e*rc*e*rc-xup*xup)-y0
+        x2 = sqrt(e*rc*e*rc-yup*yup)-x0  &  y2=1.
+        a = 1.  &  ab = (1.-y1)*(1.-x2)/2.  &  area = a-ab
+        x = 0.5  &  y=0.5
+        xb = x2+2.*(1.-x2)/3.  &  yb = y1+2.*(1.-y1)/3.
+        xxm = x0+(a*x-ab*xb)/area   ; Centroid coord. referred to absolute axis
+        yym = y0+(a*y-ab*yb)/area
+        end
+      (x1 le 0.): begin
+        area = 0.
+        xxm = 0.  &  yym = 0.
+        end
+    endcase
+
+;******************************
+;Esto es la diferencia con radius_aper2.pro
+
+;the coordinates for the inner part of the pixel are replaced by those for the outer part
+
+if (x1 le 0.) then goto,salta
+
+xa=xxm-x0
+ya=yym-y0
+
+xb=(0.5 - area*xa)/(1.-area)
+yb=(0.5 - area*ya)/(1.-area)
+
+xxm=xb+x0
+yym=yb+y0
+area=1.-area
+
+salta:
+
+;******************************
+
+; Define distance and aperture in those pixels intersect.by e*rc (first quadrant)
+
+  rd1(i(k),j(k)) = sqrt(xxm*xxm+yym*yym)/rc
+ ;normaliza al radio anular externo.
+  rd1(j(k),i(k)) = rd1(i(k),j(k))
+  ap1(i(k),j(k)) = area
+  ap1(j(k),i(k)) = area
+
+  endfor
+
+; Centering of the masks in the center of the matrix (pixel (r,r)) and generate
+; the other three quadrants
+
+  rd = rd*0. & ap = rd
+  rd(r,r) = rd1
+  rd(1,r) = reverse(rd(r+1:*,r:*),1)
+  rd(1,1) = reverse(rd(1:*,r+1:*),2)
+  ap(r,r) = ap1
+  ap(1,r) = reverse(ap(r+1:*,r:*),1)
+  ap(1,1) = reverse(ap(1:*,r+1:*),2)
+
+
+;openw,1,'resultados'
+;  for m=0,npix do printf,1,i(m),j(m)
+;  for m=0,d-1 do begin
+;    printf,1,rd(*,m),format='(1x,10F7.4)'
+;  endfor
+;  printf,1,''
+;  for m=0,d-1 do begin
+;    printf,1,ap(*,m),format='(1x,10F7.4)'
+;  endfor
+;close,1
+
+;*********************************************************************
+
+; FIN DEL BLOQUE EN EL QUE SE TRATA EL BORDE INTERNO DE LA MASCARA ANULAR DE 
+; DISTANCIAS (PIXELs FRACCIONADOS EN BORDE INTERNO DEL ANILLO).
+
+;*********************************************************************
+;*********************************************************************
+
+; Retoque del rd_a definido al principio, para incluir el efecto del
+; hueco central y el tratamiento de pixels fraccionados en
+; el borde interior del anillo.
+
+
+   rd_a(where(ap eq 1.)) = 0.
+
+   w = where((ap ne 1.) and (ap ne 0.))
+    rd_a(w) = rd(w)
+
+
+return,rd_a
+
+finito:
+
+end
+
+;*******************************************************************************************
+
+function theta,r
+
+; Creates a 2r x 2r matrix with the angular coordinates (in rad) of each pixel 
+; as measured from the origin in pixel (r,r).
+
+; Programa editado el 16 de Febrero de 1999
+; Jose A. Bonet 
+
+;--------------------------------------------------------------------------
+
+ 
+  d=2*r                              ; d x d es la dimension final de la imagen
+  x=(findgen(d)-r) # transpose(replicate(1.,d))   ;x-coordinates of the pixels
+  y=transpose(x)   				  ;y-coordinates of the pixels
+
+  w=where(abs(x) lt 1.e-35,num) ;+/- 1.e-38 = floating underflow in the division
+  if num ne 0 then x(w)=0
+  th=atan(y,x)
+
+  return,th
+
+end
+
+;*********************************************************************************************
+
+function zernike_mn,jmax
+
+; La salida es un array de dimensiones 2 x jmax que contiene las parejas
+; de coef. [m,n] para cada valor de j desde 1 hasta jmax.
+;		mn = zernike_mn(jmax)
+; !!! Tener en cuenta que los valores de [m,n] correspondientes a un deter-
+; minado valor de j son los elementos mn(0,j-1), y mn(1,j-1) del array !!!
+
+; Programa editado el 16 de Febrero de 1999
+; Jose A. Bonet (transcripcion a idl del programa zernike_mn_f.ana en ana 
+;                de M.L.)
+;--------------------------------------------------------------------------
+
+  m=0
+  n=0
+  i=0
+  REPEAT BEGIN
+    i=i+1
+    d = intarr(i+1)
+    IF Odd(i) THEN BEGIN
+      FOR ii=0,i/2 DO BEGIN
+        d(2*ii) = 2*ii+1
+        d(2*ii+1) = 2*ii+1
+      ENDFOR 
+    ENDIF ELSE BEGIN 
+      FOR ii=1,i/2 DO BEGIN
+        d(2*ii-1) = 2*ii
+        d(2*ii) = 2*ii
+      ENDFOR
+    ENDELSE
+    m = [m,d]
+    n = [n,replicate(i,i+1)]
+  END UNTIL (size(n))(1) GE jmax
+
+  mn=transpose([[m],[n]])
+  
+  Return, mn
+
+end
+
+;****************************************************************************************
+
+function fact,numax
+
+; La salida es una array DOUBLE de dimension numax+1 que contiene las 
+; factoriales de todos los numeros desde 0 hasta numax.
+;		fac = fact(numax)
+
+; Programa editado el 16 de Febrero de 1999
+; Jose A. Bonet
+;--------------------------------------------------------------------------
+
+
+  fac=dblarr(numax+1)
+  fac(0)=double(1)                 ;factorial de 0 es 1 by definition
+  if numax eq 0 then return,fac
+  fac(1)=double(1)
+  for i=2,numax do begin
+    fac(i)=fac(i-1)*double(i)
+  endfor
+
+  return,fac
+
+end
+
+;********************************************************************************************
+
+function zernike2,r,r_c,jmax
+
+; Retorna un array 3D de dimensiones (2r x 2r x jamx+1) que contiene los
+; polinomios de Zernike desde j=1 hasta j=jmax. 
+; La matriz para j=0 (es decir (*,*,0)) contiene la mascara que define la
+; apertura.
+
+; INPUTS: 
+;	r  = semi-dimension of the matrices. 
+;	r_c = radius of the aperture.
+
+; OUTPUTS:
+;	     zer = zernike2(r,r_c,jmax)
+
+; Programa editado el 17 de Febrero de 1999.
+; Modificaciones respecto zernike.pro sustituyendo las rutinas aperture.pro
+; y unitradius.pro por la nueva rutina radius_aper.pro  (28 de Abril de 1999)
+; y por radius_aper2.pro (6 de Mayo de 1999).
+; Jose A. Bonet (transcripcion a idl del programa zernike_function_f.ana en ana 
+;                de M.L.)
+
+;--------------------------------------------------------------------------
+    
+  IF jmax gt 45 THEN BEGIN 
+    print,'jmax too large: redefine jmax=45'
+    jmax=45
+  ENDIF
+
+; Calcula las coordenadas (rd,theta) en cada pixel de la apertura, con
+; origen en (r,r). Tambien calcula la mascara que define la apertura.
+
+;  rd=radius_1(r,r_c,support)  ;when fractional pixel at the edge is not consid.
+  rd = radius_aper2(r,r_c,support)
+  th = theta(r)
+  support_plus = support NE 0			  
+
+; Prepara el calculo de los polinomios
+			   
+  mn = Zernike_mn(jmax)            ;Calculo de [m,n] para cada j.
+  fac=fact(10)       ;Calculando 10 factoriales es suficiente hasta j=50 o mas.
+  zer=fltarr(2*r,2*r,jmax+1)       ;Array almacen de los polinomios calculados.
+  zer(0,0,0)=support      ;en j=0 se almacena la mascara que define la apertura
+
+; Comienza el gran loop para generar los polinomios *******************
+
+FOR j=1,jmax DO BEGIN
+
+  IF j EQ 1 THEN BEGIN
+
+    z = support_plus
+
+  ENDIF ELSE BEGIN
+
+    m = mn(0,j-1)
+    n = mn(1,j-1)
+
+; Calculo de la parte angular del polinomio
+
+;    print,''
+    IF m EQ 0 THEN BEGIN
+      c = sqrt(double(n+1))
+;      print,j,m,n,n+1, $
+;		     format='("j,m,n=",I2,",",I2,",",I2,"  sqrt(",F4.1,")*",$)'
+    ENDIF ELSE BEGIN
+      c = sqrt(double(2*(n+1)))
+      IF odd(j) THEN BEGIN 
+        c = c * sin(m*th)
+;        print,j,m,n,2*(n+1),m, $
+;	format='("j,m,n=",I2,",",I2,",",I2,"  sqrt(",F4.1,")*sin(",I1,"Th)*",$)'
+      ENDIF ELSE BEGIN
+        c = c * cos(m*th)
+;        print,j,m,n,2*(n+1),m, $
+;	format='("j,m,n=",I2,",",I2,",",I2,"  sqrt(",F4.1,")*cos(",I1,"Th)*",$)'
+      ENDELSE
+    ENDELSE
+
+; Calculo de la parte radial del polinomio
+
+    z = dblarr(2*r,2*r)
+    FOR s=0,(n-m)/2 DO BEGIN
+      IF n-2*s EQ 0 THEN BEGIN 
+	rx = double(support_plus)
+      ENDIF ELSE BEGIN 
+	rx = double(rd)^(n-2*s)
+      ENDELSE 
+      tmp = ((-1.d0)^s*fac(n-s)) / (fac(s)*fac((n+m)/2-s)*fac((n-m)/2-s))
+;;     print,max([n-s,s,(n+m)/2-s,(n-m)/2-s])
+;      print,tmp,n-2*s,format='(F6.1,"r^",I1,$)'
+      z = z + rx * tmp
+    ENDFOR
+;    print,''
+
+    z = z * c
+    
+  ENDELSE
+
+; Reajuste de la rms(Z) a 1. (Ver apendice H)
+
+;;;  zer(0,0,j) = float( z )  
+  zer(0,0,j) = float( z / Sqrt(Total(support * z * z)/Total(support)))
+; print,sqrt(total(z^2 * support)/total(support))      ;rms de Z_j sin reajuste
+; print,sqrt(total(double(zer(*,*,j))^2 * support)/total(support))  ;rms de Z_j
+; print,total(double(zer(*,*,j))*support)/total(support)          ;media de Z_j
+
+ENDFOR
+
+; Fin del gran loop *****************************************************     
+  
+  Return,zer
+
+end
+
+;******************************************************************************************
+
+function zernike_annular,r,r_c,e,jmax
+
+; Retorna un array 3D de dimensiones (2r x 2r x jamx+1) que contiene los
+; polinomios de Zernike desde j=1 hasta j=jmax. 
+; La matriz para j=0 (es decir (*,*,0)) contiene la mascara que define la
+; apertura.
+
+; INPUTS: 
+;	r  = semi-dimension of the matrices. 
+;	r_c = radius of the aperture.
+;	e   = obscurecimiento central expresado en fraccion de "rc" (p.ej. 0.25)
+
+; OUTPUTS:
+;	     zer = zernike_annular(r,r_c,e,jmax)
+
+;____________________________________________________________________________
+; 25 - Enero - 2004
+; Editado a partir de zernike2.pro, sustituyendo radius_aper2.pro por
+; radius_aper_annular.pro para generar mascaras anulares. Ademas se ha
+; incluido un proceso de ortogonalizacion de Gram-Schmidth para recuperar
+; la naturaleza ortonormal de los Zernikes mutilados por el dominio anular.
+;
+; Dario del Moro y Jose A. Bonet
+;____________________________________________________________________________
+   
+  IF jmax gt 45 THEN BEGIN 
+    print,'jmax too large: redefine jmax=45'
+    jmax=45
+  ENDIF
+
+; Calcula las coordenadas (rd,theta) en cada pixel de la apertura, con
+; origen en (r,r). Tambien calcula la mascara que define la apertura.
+
+;  rd=radius_1(r,r_c,support)  ;when fractional pixel at the edge is not consid.
+  rd = radius_aper_annular(r,r_c,e,support)     ; (DARIO y JOSE)
+  th = theta(r)
+  support_plus = support NE 0			  
+
+; Prepara el calculo de los polinomios
+			   
+  mn = Zernike_mn(jmax)            ;Calculo de [m,n] para cada j.
+  fac=fact(10)       ;Calculando 10 factoriales es suficiente hasta j=50 o mas.
+  zer=fltarr(2*r,2*r,jmax+1)       ;Array almacen de los polinomios calculados.
+  zer(0,0,0)=support      ;en j=0 se almacena la mascara que define la apertura
+
+
+; Comienza el gran loop para generar los polinomios *******************
+
+FOR j=1,jmax DO BEGIN
+
+  IF j EQ 1 THEN BEGIN
+
+    z = support_plus
+
+  ENDIF ELSE BEGIN
+
+    m = mn(0,j-1)
+    n = mn(1,j-1)
+
+; Calculo de la parte angular del polinomio
+
+;    print,''
+    IF m EQ 0 THEN BEGIN
+      c = sqrt(double(n+1))
+;      print,j,m,n,n+1, $
+;		     format='("j,m,n=",I2,",",I2,",",I2,"  sqrt(",F4.1,")*",$)'
+    ENDIF ELSE BEGIN
+      c = sqrt(double(2*(n+1)))
+      IF odd(j) THEN BEGIN 
+        c = c * sin(m*th)
+;        print,j,m,n,2*(n+1),m, $
+;	format='("j,m,n=",I2,",",I2,",",I2,"  sqrt(",F4.1,")*sin(",I1,"Th)*",$)'
+      ENDIF ELSE BEGIN
+        c = c * cos(m*th)
+;        print,j,m,n,2*(n+1),m, $
+;	format='("j,m,n=",I2,",",I2,",",I2,"  sqrt(",F4.1,")*cos(",I1,"Th)*",$)'
+      ENDELSE
+    ENDELSE
+
+; Calculo de la parte radial del polinomio
+
+    z = dblarr(2*r,2*r)
+    FOR s=0,(n-m)/2 DO BEGIN
+      IF n-2*s EQ 0 THEN BEGIN 
+	rx = double(support_plus)
+      ENDIF ELSE BEGIN 
+	rx = double(rd)^(n-2*s)
+      ENDELSE 
+      tmp = ((-1.d0)^s*fac(n-s)) / (fac(s)*fac((n+m)/2-s)*fac((n-m)/2-s))
+;;     print,max([n-s,s,(n+m)/2-s,(n-m)/2-s])
+;      print,tmp,n-2*s,format='(F6.1,"r^",I1,$)'
+      z = z + rx * tmp
+    ENDFOR
+;    print,''
+
+    z = z * c
+    
+  ENDELSE
+   
+  
+; Ortogonalization de Graham-Schmidt con los Zernikes ya creados (DARIO)
+
+  FOR I=1,J-1 do begin
+	Projec= total(support*Z*Zer(*,*,I) )/total(support)
+	Z=Z-Projec*Zer(*,*,I)
+  ENDFOR
+  
+
+; Reajuste de la rms(Z) a 1. (Ver apendice H)
+
+;;;  zer(0,0,j) = float( z )  
+  zer(0,0,j) = float( z / Sqrt(Total(support * z * z)/Total(support)))
+; print,sqrt(total(z^2 * support)/total(support))      ;rms de Z_j sin reajuste
+; print,sqrt(total(double(zer(*,*,j))^2 * support)/total(support))  ;rms de Z_j
+; print,total(double(zer(*,*,j))*support)/total(support)          ;media de Z_j
+
+ENDFOR
+
+; Fin del gran loop *****************************************************
+
+  Return,zer
+
+end
+
+;*******************************************************************************************
+
+function crosscorr_c,f,g,doble=dd
+
+; Calcula la cross-correlation de las funciones 2D complejas, f y g, cada una
+; de dimensiones n x n. Utiliza el Tma. de cross-correlation de la transformada
+; discreta de Fourier.
+
+;    /double  : if set, all the calculations are performed in Double Precission
+;	        although the output will be converted to Single Precission.
+
+; Cuando se trabaja en Double Precision sale al final del programa un warning
+; diciendo: "Program caused arithmetic error: Floating underflow"
+
+; El resultado:
+;		cross=crosscorr_c(f,g,doble=dd)
+; es una funcion compleja (Single Precission) de dimensiones 2n x 2n
+;
+; Programa editado el 15 de Febrero de 1999.
+; Jose A. Bonet
+;
+;-------------------------------------------------------------------------
+
+; Prolonga las funciones con ceros hasta dimension 2n x 2n
+
+  n2=2*(size(f))(1)
+  fex=complexarr(n2,n2)
+  if keyword_set(dd) then fex=dcomplexarr(n2,n2)
+  gex=fex
+  fex(0,0)=f & gex(0,0)=g
+
+; Aplica el Tma. de correlacion
+
+  fex=fft(fex,-1) & gex=fft(gex,-1)
+  cross=fft(n2*n2*conj(fex)*gex,1)
+  cross=complex(cross)         ; returns a Single Precission function
+
+return,cross
+
+end
+
+;*****************************************************************************************
+
+function otfunc,h,norm
+
+; Calcula la Optical Transfer Function.
+; Inputs: 
+;	   h = generalized pupil complex function of dimensions n x n.
+; Outputs:
+;	   norm = normalization factor for the OTF
+;	   otf  = otfunc(h,norm)
+; otf = funcion compleja de dimensiones 2n x 2n, centered at pixel (n,n)
+;
+; Programa editado el 15 de Febrero de 1999.
+; Jose A. Bonet
+;
+;-------------------------------------------------------------------------
+
+  n=(size(h))(1)
+
+; Calculo de otf = Autocorrelation (generalized pupil function)
+
+  otf=crosscorr_c(h,h,/doble)    ; aqui crosscorr_c ha de trabajar en Double 
+		                 ; Precission. Si no, la otf que resulta no 
+				 ; es perfectamente hermitica y esto redunda 
+				 ; en Q y Q^2 --> ruido al restaurar.
+  
+; Normaliza al valor en el origen (correspondiente a shift de h = 0)
+
+  norm=float(otf(0,0))
+  otf=otf/norm
+
+; Desplaza para que el maximo de la otf este en el punto de coord. (n,n)
+
+  otf=shift(otf,n,n)
+
+  return,otf
+
+end
+
+;*****************************************************************************************
+
+function win_cos,nx,ny,perc
+
+; This program generates a window 2D (nx*ny) filled by 1s, smoothed at the edges
+; with a cosine shape. The width of the smoothed transition to zero is given by a 
+; percentage ("perc") of the length of the image dimensions.
+; For perc=0 the program produces a window filled by 1s without attenuated edges.
+; Example:     win = win_cos(nx,ny,perc)
+;
+; Programa edited on 2 July 1998.
+; Jose A. Bonet
+;
+;-------------------------------------------------------------------------
+
+   wx=replicate(1.,nx) & wy=replicate(1.,ny)
+   if perc eq 0 then goto,fin
+   nxw=nint(perc*nx/100.) & nyw=nint(perc*ny/100.)
+   wi=0.5*(1.-cos(!pi*findgen(nxw)/nxw))
+   wx(0:nxw-1)=wi & wx(nx-nxw+1:nx-1)=reverse(wi(1:nxw-1))
+   wi=0.5*(1.-cos(!pi*findgen(nyw)/nyw))
+   wy(0:nyw-1)=wi & wy(ny-nyw+1:ny-1)=reverse(wi(1:nyw-1))   
+   fin:
+   win=wx#wy
+
+   return,win
+
+   end
+
+;*****************************************************************************************
+
+function otf_CCD,dimx,dimy,ax,ay,dx,dy   ;,imav,arr,arreb,arrf,psfpix
+
+; Calcula la OTF que representa los efectos causados por la CCD, que se resumen en:
+
+; 1. Detector footprint OTF
+; Efecto de integracion de la imagen sobre los pixeles del detector. 
+; Se  supone   la   imagen  que  llega  a  la  CCD  muestreada  idealmente 
+; (es decir con deltas de Dirac) con intervalos de muestreo "sampling"  sx, sy  
+; La OTF que resulta esta centrada en el centro de la imagen (dimx/2,dimy/2)
+; y es una función float (aunque los cálculos se han hecho en double prec).
+
+; 2. Sampling OTF
+; Efecto estadístico promedio del posicionado relativo de la imagen
+; respecto de la CCD (promedio de OTFs para distintas posiciones relativas)
+
+; 3. Crostalk   ESTA POR DEFINIR !! 
+;    (incluye lateral diffusion  &  charge-transfer inefficiency  
+
+;INPUTS: ------------------------------------------------
+;	dimx,dimy = numero de muestras ideales en la imagen (dimensiones de
+;		    la imagen)
+
+;       ax,ay =  ax (ay) es el numero de muestras ideales que captura cada
+;                pixel (superficie elemental fotosensible del CCD) en la
+;                direccion OX (OY). Es decir, ax y ay son las dimensiones del
+;		 pixel de la CCD en terminos de numero de intervalos de
+;		 muestreo sx,sy. Estas dimensiones, en general, no seran numeros
+;		 enteros. 
+;                Poner ax=ay=0 si no se quiere modelar este efecto (footprint)
+;
+;       dx,dy =  Intervalos de muestreo en x e y impuesto por la CCD (distancia
+;                entre los centros de dos pixeles adyacentes) en
+;                terminos de numero de intervalo de muestreo sx,sy.
+;                Poner dx=dy=0 si no se quiere modelar este efecto (sampling)
+;
+;OUTPUT : ------------------------------------------------
+;                otfCCD: OTF que modela la degradación de la imagen
+;                producida por la CCD.
+;
+;       EJEMPLO: OTF=otf_CCD(512,512,1,1,2,2 )
+;                Corresponde a un caso en que el intervalo de muestreo
+;                en la CCD es el doble del tamaño de pixel  
+;       
+;	Warning.- Si ax=dx y ay=dy entonces toda la superficie del
+;                 chip es fotosensible (no hay espacio inter-pixel)
+;    
+;______________________________________________________________ 
+
+; Editado el 26 de Diciembre de 2004 por  Jose A. Bonet
+; Reformado el 1 de Mayo de 2005 por Santiago Vargas y Jose A. Bonet
+; para incluir el efecto de "Sampling OTF" ademas del "Footprint OTF"
+; Revisado el 24 de Octubre de 2007 (se le cambia el nombre de 
+; mtf_CCD_new.pro al de otf_CCD.pro)
+;_______________________________________________________________
+
+
+dimx2 = dimx/2
+dimy2 = dimy/2
+nux = ([dindgen(dimx2+1),reverse(dindgen(dimx2-1)+1)]) # (dblarr(dimy)+1)/dimx
+nuy = (dblarr(dimx)+1) # ([dindgen(dimy2+1),reverse(dindgen(dimy2-1)+1)])/dimy
+
+otf_x = fltarr(dimx,dimy) + 1. & otf_y = otf_x
+
+wx=where(nux ne 0.,numx)  &  wy=where(nuy ne 0,numy)
+
+; Efectos en la OTF producidos por el detector: Footprint  y Sampling
+
+; DETECTOR FOOTPRINT OTF
+if (ax ne 0 and ay ne 0) then begin
+   otf_x(wx) = sin(!pi*nux(wx)*ax)/!pi/nux(wx)/float(ax) ; Footprint OTF
+   otf_y(wy) = sin(!pi*nuy(wy)*ay)/!pi/nuy(wy)/float(ay) ; Footprint OTF
+endif
+
+; SAMPLING OTF
+; if dx=wx then (Contiguos Focal-plane Array) 
+; else (Sparse Focal-plane Array)  
+
+if (dx ne 0 and dy ne 0) then begin
+   otf_x(wx) = otf_x(wx)*sin(!pi*nux(wx)*dx)/!pi/nux(wx)/float(dx) ; Sampl. OTF 
+   otf_y(wy) = otf_y(wy)*sin(!pi*nuy(wy)*dy)/!pi/nuy(wy)/float(dy) ; Sampl. OTF
+endif  
+
+otfCCD = otf_x * otf_y
+otfCCD = float(shift(otfCCD,dimx/2,dimy/2))
+
+;ori=100
+;arr=imav(ori:ori+dimx-1,ori:ori+dimx-1)
+;arreb=rebin(arr,dimx/ax,dimx/ay)
+;arrf=float(fft(fft(arr,-1)*mtfpix,1))
+;psfpix = float(fft(mtfpix,-1))
+;print,total(psfpix)
+;
+return,otfCCD
+
+end
+
+;****************************************************************
+
+pro plot_contour,filter,mask,l
+
+; Representacion de 10 isolineas en un filtro optimo.
+
+;INPUTS:
+;	filter = filtro optimo de dimensiones (siz x siz) cuyas isolineas 
+;		 quiero dibujar. El filtro ha de estar centrado en el pixel 
+;		 (siz/2 x siz/2).
+;	mask   = template (siz x siz) centrado en (siz/2 x siz/2), con 0's en 
+;		 el rango de frec. < cutoff y 1's mas alla de la cutoff.
+;	l      = array de 10 numeros con los valores de la funcion para los
+;		 que se desean las isolineas.
+
+;____________________________________________________________________________
+
+; Editado el 26 de Enero de 2001
+; Jose A. Bonet
+;____________________________________________________________________________
+ 
+
+nx=(size(filter))(1)
+ima_1=filter * (mask eq 0) + mask
+window,8,xpos=0 
+x = findgen(nx)
+y = findgen(nx) 
+c_l = [1,0,1,0,1,0,1,0,1,0]                   ; en que niveles quiero labels
+;c_lst = replicate(1,10)                      ; linestyle en isolineas
+c_lst = [0,1,0,1,0,1,0,1,0,1]                 ; linestyle en isolineas
+c_t = replicate(1,10)                         ; thickness en isolineas
+c_c = [50,75,100,125,150,175,200,225,250,150] ; intensidad de gris en caso de
+					      ; rellenar espacio entre isolineas
+;contour,ima_1,x,y,/xst,/yst,levels=l,c_color=c_c,/fill
+contour,ima_1,x,y,/xst,/yst,levels=l,c_labels=c_l,c_linestyle=c_lst,  $
+	title='Isocontours of the filter',c_charsize=1.,/noerase
+window,1,xs=nx,ys=nx,xpos=860,ypos=0
+tvscl,filter				; imagen auxiliar del filtro para
+profiles,filter				; comparar con mapa de isolineas.
+
+end
+
+;******************************************************************
+
+function return_low_f
+
+; Rutina interactiva para seleccionar con el raton en una widget un valor
+; de low_f comprendido entre 0. y 0.8.
+
+; ejemplo de uso:    low_f = return_low_f()
+
+;___________________________________________________________________________
+
+; Editado el 26 de Enero de 2001
+; Jose A. Bonet
+;____________________________________________________________________________
+
+
+; Construccion de una widget para clickear con el raton
+
+mm=81
+x=findgen(mm)/100.
+y=fltarr(mm)+1
+window,7,xs=300,ys=75,xpos=0,ypos=300,title='seleccion del valor de low_f'
+plot,x,y,color=0,back=255,xrange=[0,0.8],/xst,yrange=[0,1],xticks=8,$
+	xticklen=1.,ystyle=-1,xmargin=[2,2],ymargin=[3,1]
+oplot,[0.,0.],[0.,1.],color=0
+
+; Seleccion interactiva
+
+low_f=0.
+print,'************ SELECT VALUE FOR low_f with the mouse **************'
+print,'Central--> low_f=0     Left--> select in widget     Right--> quit'
+print,format = '("low_f= ",$)'
+otravez:
+cursor,x,y,/down
+case !err of
+  2: begin                                       ; Central button !err=2
+       low_f=0
+       print,low_f,format='(F6.3,$)'
+       goto,otravez
+       end
+  1: begin                                       ; Left button !err=1
+       low_f=x
+       print,low_f,format='(F6.3,$)'
+       goto,otravez
+     end
+  else: begin
+	  print,''
+	  print,'Final selected low_f= ',low_f   ; Right button !err=4
+	end
+endcase
+wdelete,7
+
+return,low_f
+
+end
+
+;*******************************************************************
+
+;-------------------------------------------------------------
+;+
+; NAME:
+;      SMOOTHE
+; PURPOSE:
+;      This program will smooth an array, including the edges,
+;      using the SMOOTH function of IDL by surrounding the array
+;      with duplicates of itself and then smoothing the large
+;      array. 
+; CATEGORY:
+;      IMAGE PROCESSING
+; CALLING SEQUENCE:
+;      done=smoothe(aray,smoonum)
+; INPUTS:
+;      aray = The array that you wish to smooth.
+;        type: array, any type
+;      smoonum = smoonum specifies the width of the smoothing window.
+;        type: scalar,integer
+; KEYWORD PARAMETERS:
+; OUTPUTS:
+;      done = The smoothed array.
+;        type: array, any type
+; COMMON BLOCKS:
+; NOTES:
+; MODIFICATION HISTORY:
+;      H. Cohl,  23 Sep, 1991    --- Generalization.
+;      K. Reardon,  19 Jun, 1991 --- Initial programming.
+;-
+;-------------------------------------------------------------
+
+function smoothe,aray,smoonum,help=help
+
+  ;Display idl header if help is required.
+  if keyword_set(help) or n_params() lt 2 then begin
+    get_idlhdr,'smoothe.pro'
+    done=-1
+    goto,finishup
+  endif
+
+  s=size(aray)
+  dim=s(0)
+  border=smoonum*2
+
+  if (dim eq 0) then begin
+    print,"That ain't an array!  Its a scalar."
+    done=-1
+    goto,finishup
+  endif
+
+  if (dim eq 1) then goto,oned
+  if (dim eq 2) then goto,twod
+  if (dim ge 3) then begin
+    print,'Sorry, I am too tired to process such a large array.'
+    done=-1
+    goto,finishup
+  endif
+
+  ;1-d 
+
+  oned:
+  eg1=s(1) + (smoonum-1)
+  bigarr=fltarr(border + s(1))
+  bigarr(smoonum:eg1)=aray
+  rott=rotate(aray,5)
+  bigarr(0:smoonum-1)=rott(s(1) - smoonum:s(1)-1)
+  bigarr(s(1)+smoonum:s(1)+(2*smoonum)-1)=rott(0:smoonum-1)
+  sbigarr=smooth(bigarr,smoonum)
+  done=sbigarr(smoonum:eg1)
+  goto,finishup
+
+  ;2-d
+
+  twod:
+  if s(1) eq 1 then begin
+    arr2=fltarr(s(2),s(1))
+    arr2(*,0)=aray(0,*)
+    aray=arr2
+    s=size(aray)
+    goto,oned
+  endif
+
+  eg1=s(1) + (smoonum-1)
+  eg2=s(2) + (smoonum-1)
+  max1=s(1) + border - 1
+  max2=s(2) + border - 1
+
+  bigarr=fltarr(border + s(1),border+s(2))
+  bigarr(smoonum:eg1,smoonum:eg2)=aray
+  rott=rotate(aray,5)
+  bigarr(0:smoonum-1,smoonum:eg2)=rott(s(1)-smoonum:s(1)-1,*)
+  bigarr(s(1)+smoonum:max1,smoonum:eg2)=rott(0:smoonum-1,*)
+  rott=rotate(aray,7)
+  bigarr(smoonum:eg1,0:smoonum-1)=rott(*,s(2)-smoonum:s(2)-1)
+  bigarr(smoonum:eg1,s(2)+smoonum:max2)=rott(*,0:smoonum-1)
+  rott=rotate(aray,2)
+  bigarr(0:smoonum-1,0:smoonum-1)=rott(s(1)-smoonum:s(1)-1,s(2)-smoonum:s(2)-1)
+  bigarr(s(1)+smoonum:max1,s(2)+smoonum:max2)=rott(0:smoonum-1,0:smoonum-1)
+  bigarr(0:smoonum-1,s(2)+smoonum:max2)=rott(s(1)-smoonum:s(1)-1,0:smoonum-1)
+  bigarr(s(1)+smoonum:max1,0:smoonum-1)=rott(0:smoonum-1,s(2)-smoonum:s(2)-1)
+  sbigarr=smooth(bigarr,smoonum)
+  done=sbigarr(smoonum:eg1,smoonum:eg2) 
+  goto,finishup
+
+  finishup:
+
+  return, done 
+
+
+end
+
+;******************************************************************************
+
+FUNCTION SCONVOL , A , KERNEL , SCALE_FACTOR = scale_factor , STD = std , FWHM = fwhm
+;-
+; NAME:
+;	SCONVOL
+;
+; PURPOSE:
+;	This program will smooth a 2D array, including the edges,
+;	with a 2D kernel which can be separated into two symmetric,
+;	one-dimensional kernels. Problems of this kind arise when,
+;	e.g. an array is to be convolved with a 2D symmetric
+;	gaussian, which is separable into two one-dimensional
+;	convolutions.
+;
+; CALLING SEQUENCE:
+;	Result = SCONVOL( A , KERNEL , SCALE_FACTOR = , STD = std , FWHM = fwhm )
+;
+; INPUTS:
+;	A = a 2D array of any basic type except string.
+;
+;	KERNEL = a one-dimensional vector kernel. Convolution with
+;		this kernel is applied along x and y directions.
+;		Dimension must be odd.
+;
+;	SCALE_FACTOR = a scale factor for the convolution. See CONVOL.
+;
+;	STD = standard deviation of the 2-D gaussian.
+;
+;	FWHM = full width at half maximum of the 2-D gaussian.
+;
+; OUTPUTS:
+;	Result = the convolved array, a floating point array. The
+;		gaussian window is normalized to 1.
+;
+; COMMON BLOCKS:
+;	None.
+;
+; SIDE EFFECTS:
+;	None.
+;
+; RESTRICTIONS:
+;	Only convolves two dimensional arrays.
+;
+; PROCEDURE:
+;	Array A is convolved separately in X and Y with the 1-D kernel.
+;	If KERNEL is not given, and either STD or FWHM are input, kernel
+;	will be a gaussian of standard deviation STD or full width at
+;	half maximum FWHM.
+;	Edges are treated by duplicating them and convolving the whole
+;	array.
+;	The standard deviation and the full width at half maximum of a
+;	symmetric 2D gaussian are related by the formula:
+;
+;		fwhm = 2xSQRT(2xALOG(2))xstd
+;
+; MODIFICATION HISTORY:
+;	R.Molowny-Horas and Z.Yi, May 1994.
+;-
+;
+ON_ERROR,2
+
+	s = SIZE(a)
+	IF s(0) NE 2 THEN MESSAGE,'Array must be 2D'
+	IF N_ELEMENTS(scale_factor) EQ 0 THEN scale_factor = 1.
+
+	IF N_ELEMENTS(kernel) EQ 0 THEN BEGIN
+		IF N_ELEMENTS(fwhm) EQ 0 AND N_ELEMENTS(std) EQ 0 THEN $
+			MESSAGE,'Convolve with what?"
+		IF KEYWORD_SET(fwhm) THEN std = fwhm/(2.*SQRT(2.*ALOG(2.)))
+		width = FIX(std*9.)			;Wings of the gausian.
+		IF NOT ODD(width) THEN width = width+1	;Only odd numbers.
+		kernel = FINDGEN(width) - width/2
+		kernel = EXP(-kernel*kernel/(2.*std^2))	;Kernel.
+		kernel = kernel/(std*SQRT(2.*!pi))
+	ENDIF ELSE BEGIN
+		width = N_ELEMENTS(kernel)
+		IF ODD(width) NE 1 THEN MESSAGE,'Dimension of kernel must be odd'
+	ENDELSE
+
+	big = FLTARR(s(1)+width-1,s(2)+width-1,/NOZERO)	;Big array.
+	edge = width/2
+	big(edge,edge) = a
+	FOR i = 0,edge-1 DO BEGIN			;Duplicates rows.
+		big(i,edge) = a(edge-1-i,*)
+		big(s(1)+edge+i,edge) = a(s(1)-1-i,*)
+	ENDFOR
+
+	big(0) = CONVOL(big(*),kernel,scale_factor)	;Convolves in X.
+	big = ROTATE(big,1)
+
+	FOR i = 0,edge-1 DO BEGIN			;Duplicates columns.
+		big(i,0) = big(2*edge-1-i,*)
+		big(s(2)+edge+i,0) = big(s(2)+edge-1-i,*)
+	ENDFOR
+
+	big(0) = CONVOL(big(*),kernel,scale_factor)	;Convolves in Y.
+	big = ROTATE(big,3)				;Rotates it back.
+	big = big(edge:s(1)-1+edge,edge:s(2)-1+edge)	;Removes edges.
+
+	RETURN,big
+
+END
+
+;*****************************************************************
+
+PRO objekt2,ima,tab
+
+; Si se quiere conocer el numero de objetos identificados quitar el comentario
+; de la ultima linea. !!!!!!!!!!!!!!!!!!
+
+;A more siple and efficient version of OBJEKT1,
+;based on the IDL routine LABEL_REGION.
+;
+;This program labels objects in a segmented image.
+;(Segmentation can be performed using e.g. UDISOL.PRO.)
+;Objects are defined as subsets of non-zero pixels which
+;are neighboring side-by-side. Single-pixel objects are
+;considered as a noise and excluded, i.e. their object
+;number is set to zero. Pixels forming an object are
+;labelled by the same object number, i.e. all pixels of
+;the n-th object are labelled by object number 'n'.
+;
+;CALLING SEQUENCE: objekt1,image,table
+;
+;INPUT: 2-D array IMAGE - a segmented image, where the
+;	potential object pixels have a non-zero value,
+;	other (background) pixels have a zero value.
+;OUTPUT: 2-D array TABLE - a two-column table, where
+;	the 0-th column contains object numbers and
+;	the 1-st column contains subscripts of non-zero
+;	pixels in 1-D representation.
+;NOTE:  Since the subscripts are stored as longwords,
+;	there is practically no limitation concerning
+;	the image size.
+;
+; 24 February 2000, Michal.
+;
+
+on_error,1
+s=size(ima)
+if s(0) ne 2 then message,'*** Input must be a 2-D array'
+h=where(ima,n)		;non-zero pixels
+if n le 0    then message,'*** Input image is empty'
+if n eq s(4) then message,'*** Input image is not segmented'
+
+h=LABEL_REGION(ima)
+h=HISTOGRAM(h,reverse_indices=r)	;See IDL help for this
+					;  tricky keyword.
+n=n_elements(h)		;Number of objects. Object no. 0 is the
+			;  background and is not considered in
+			;  the following process.
+sub=r(r(1):r(n)-1)	;Reverse-indices trick; we start from
+			;  object no. 1.
+
+tab=lonarr(2,n_elements(sub))	;Output array (LONG)
+tab(1,*)=sub			;List of subscripts
+
+cnt=0			;Counter to know the position in TAB
+lab=0			;Counter giving the new object labels
+			;  after skipping single-pixel objects
+for i=1,n-1 do begin
+   if h(i) gt 1 then begin
+	lab=lab+1	;Incrementing the object label
+	tab(0,cnt:cnt+h(i)-1)=REPLICATE(lab,h(i))
+   endif else tab(0,cnt:cnt+h(i)-1)=0
+			;Here the single-pixel objects are excluded,
+			;  i.e., their object number is set to zero.
+   cnt=cnt+h(i)		;Incrementing the position counter in TAB.
+endfor
+
+;print,' Number of objects:',lab
+
+END
+
+;********************************************************************
+
+function central_object,filter0
+
+; This routine removes information beyond the first drop to zero in the first
+; approach to the filter of noise (i.e. statistical instabilities in high
+; frequencies are removed)
+
+; The goal of this routine is the same as that of "region_growth" but 
+; this program is much faster.
+
+; Uses the routine "objekt2.pro" (from M.S.) for detecting and
+; labelling objects in a segmented image.
+
+; INPUTS: 
+;	filter0 = filter of noise (first approach) resulting from the 
+;		  application of its analytical definition and removal of 
+;		  values below a certain threshold so that we have zeroes
+;		  in the background.
+
+; OUTPUTS:
+;		  filter00 = central object(filter0)
+;_____________________________________________________________________________
+
+; Edited on 1 June 2001
+; Jose A. Bonet
+;_____________________________________________________________________________
+
+  region = filter0 ne 0.
+
+  objekt2,region,tab
+
+  n = (size(filter0))(1)         ; finds the dimension of the image
+  center = long(n/2*n+n/2.)      ; finds the coord.of the pixel (n/2,n/2) in 
+			         ; the 1D array image format.
+  w = where(tab(1,*) eq center)  ; detects the number of the object placed at 
+  if w(0) eq -1 then begin       ; the center of the image.
+    print,'*** STOP routine "central_object". No power in center of the filter'
+    stop
+  endif
+  object_center = tab(0,w(0))
+
+  w = where(tab(0,*) eq object_center)
+  w = tab(1,w)		       ; coordinates of the central object in the 
+			       ; 1D array image format. 
+  region = bytarr(n,n)
+  region(w) = 1
+  filter00 = filter0*region
+
+return,filter00
+
+end
+
+;*******************************************************************
+
+pro level_of_noise,im0,siz,disp,pmask,npow0,noise_sigma0
+
+; This program evaluates the level of the power spectrum of the image im0
+; in the area of the frequency domain where there is neither physical
+; signal (i.e. beyond the cutoff) nor 'dreadful cross'. This area is
+; defined by the template "pmask".
+; This routine has been constructed from "noise_level2.pro" for the simpler
+; case of a single image.
+; The calculation of the power is done with im0 non-apodized.
+
+; Ver tambien Apendice K.
+
+; INPUTS:
+;	im0   = imagen (sin apodizar)
+;	siz   = dimension of im0
+;	disp  = muestra el resultado en display: disp=1 (Si), disp=0 (No) 
+;       pmask = mascara definiendo el rango de frecuencias donde se promedia 
+;               la potencia.
+
+; OUTPUTS:
+;	npow0 = nivel medio de potencia de ruido.
+;	noise_sigma0 = rms del ruido en la imagen enfocada.
+
+; Programa editado el 14 de Abril del 2009
+; Jose A. Bonet (programa construido simplificando noise_level2.pro)
+
+;--------------------------------------------------------------------------
+
+  p0 = abs(fft(im0,-1))^2
+  p0 = shift(p0,siz/2,siz/2)
+
+  denom=total(pmask)
+  npow0 = total(p0*pmask)/denom                    ;(Append.K)     
+
+  noise_sigma0 = siz*sqrt(npow0)                   ;(Append.K) 
+
+  if disp eq 1 then begin
+    print,''
+    print,noise_sigma0,npow0,format='("noise: rms0=",f6.4,"  pow0=",E8.2)'
+  endif
+;  window,3,xs=128,ys=128
+;  tvscl,pmask
+
+end
+
+;****************************************************************************
+
+pro level_of_noise_apo,d0,siz,disp,pmask,npow0,noise_sigma0
+
+; This program evaluates the level of the power spectrum of the image im0
+; in the area of the frequency domain where there is neither physical
+; signal (i.e. beyond the cutoff) nor 'dreadful cross'. This area is
+; defined by the template "pmask".
+; The difference with level_of_noise.pro is that here the power is computed
+; from the apodized images.
+
+; Ver tambien Apendice K.
+
+; INPUTS:
+;	d0   = Fourier transform of the apodized image (origen en el centro
+;              del array).
+;	siz   = dimension of d0
+;	disp  = muestra el resultado en display: disp=1 (Si), disp=0 (No) 
+;       pmask = mascara definiendo el rango de frecuencias donde se promedia 
+;               la potencia.
+
+; OUTPUTS:
+;	npow0 = nivel medio de potencia de ruido.
+;	noise_sigma0 = rms del ruido en la imagen enfocada.
+
+; Programa editado el 2 de Septiembre del 2009
+; Jose A. Bonet (programa construido a partir de level_of_noise.pro)
+
+;--------------------------------------------------------------------------
+
+  p0 = abs(d0)*abs(d0)
+
+  denom=total(pmask)
+  npow0 = total(p0*pmask)/denom                    ;(Append.K)     
+
+  noise_sigma0 = siz*sqrt(npow0)                   ;(Append.K) 
+
+  if disp eq 1 then begin
+    print,''
+    print,noise_sigma0,npow0,format='("noise: rms0=",f11.4,"  pow0=",E8.2)'
+  endif
+;  window,3,xs=128,ys=128
+;  tvscl,pmask
+
+end
+
+;****************************************************************************
+
+pro level_of_noise_IMaX,p0,siz,disp,pmask,npow0,noise_sigma0
+
+; This program evaluates the level of the mean power spectrum of a set of images
+; in the area of the frequency domain where there is neither physical
+; signal (i.e. beyond the cutoff) nor 'dreadful cross'. This area is
+; defined by the template "pmask".
+; The difference with level_of_noise_apo.pro is that here the power is computed
+; externaly by averaging a set power spectra from strongly apodized very similar images.
+
+; Ver tambien Apendice K.
+
+; INPUTS:
+;	p0   = promedio de espectros de potencia de todas las "imagenes normalizadas"
+;              y fuertemente apodizadas, de un barrido en lambdas y estados de 
+;              polarizacion (origen en el centro del array).
+;	siz   = dimension of p0
+;	disp  = muestra el resultado en display: disp=1 (Si), disp=0 (No) 
+;       pmask = mascara definiendo el rango de frecuencias donde se promedia 
+;               la potencia.
+
+; OUTPUTS:
+;	npow0 = nivel medio de potencia de ruido.
+;	noise_sigma0 = rms del ruido.
+
+; Programa editado el 25 de Septiembre del 2009
+; Jose A. Bonet (programa construido a partir de level_of_noise_apo.pro)
+
+;--------------------------------------------------------------------------
+
+  denom=total(pmask)
+  npow0 = total(p0*pmask)/denom                    ;(Append.K)     
+
+  noise_sigma0 = siz*sqrt(npow0)                   ;(Append.K) 
+
+  if disp eq 1 then begin
+    print,''
+    print,noise_sigma0,npow0,format='("noise: rms0=",f8.4,"  pow0=",E8.2)'
+  endif
+;  window,3,xs=128,ys=128
+;  tvscl,pmask
+
+end
+
+;****************************************************************************
+
+function filtrop_jab,fimagen,siz,npow,filterfactor,tsupport,boxcar1=boxcar1,$
+                         boxcar2=boxcar2,fwhm1=fwhm1,fwhm2=fwhm2,low_f=low_f
+
+; Rutina basada en "filter_jab.pro". Aqui el nivel de potencia de ruido
+; es un parametro input.
+
+; Esta rutina genera un filtro optimo de ruido como el descrito en 
+; Brault & White (1971), A&A 13,169 (Ver tambien Apendice M)
+; El proceso incluye dos procesos de smoothing. Primero se suaviza el espectro
+; de potencia original para atenuar sus inestabilidades estadisticas. A conti-
+; nuacion, se calcula el filtro mediante su formula analitica y se acota el
+; resultado inferiormente de modo que solo se preservan valores > low_f >= 0.
+; El salto de discontinuidad que genera este corte en el nivel low_f se suaviza 
+; en un segundo proceso de smoothing para conseguir una caida suave a cero del
+; filtro hasta la frecuancia cutoff y asi mismo atenuar posibles picos
+; remanentes.
+; Los procesos de smoothing se hacen opcionalmente mediante gausianas o boxcars
+; segun las 2 keywords que se suministran de entre: (boxcar1, fwhm1) y 
+; (boxcar2, fwhm2). Si se omiten estas keywords, el proceso se realiza sin
+; ningun smoothing.
+; El nivel de acotacion inferior se suministra mediante el keyword low_f. Si se
+; omite este keyword, la eleccion de su valor se hace interactivamente con el
+; raton al correr el programa.
+
+;INPUTS:
+;	fimagen     = transformada de Fourier de la imagen apodizada que se
+;	              quiere filtrar de ruido. La imagen ha de ser cuadrada.
+;                     "fimagen" ha de estar centrada en el pixel (siz/2,siz/2)
+;	siz         = dimension de la imagen cuadrada que se quiere filtrar.
+;		      Ha de ser un numero par; de otra forma no trabaja bien 
+;		      la sentencia:
+;			    filter = (filter+especul(filter))/2.
+;		      La funcion "filter" ha de estar centrada en el pixel (siz/2,siz/2)
+;	npow        = nivel de potencia del ruido calculado por "level_of_noise.pro" o
+;                     por "level_of_noise_apo.pro".
+;	filterfactor = parametro de regularizacion. Factor multiplicativo que eleva
+;                      artificialmente el nivel de ruido para forzar un filtro de 
+;                      ruido mas severo.
+;	tsupport    = mascara definiendo el dominio de frec. hasta la cutoff
+
+;	KEYWORDS para smoothing y acotacion del filtro:
+;	boxcar1 = tama\~no caja a convolucionar   (1er smoothing) --> No.impar
+;	boxcar2 = tama\~no caja a convolucionar   (2do smoothing) --> No.impar
+;	fwhm1   = FWHM de gaussiana a convolucionar (1er smoothing) --> No.impar
+;	fwhm2   = FWHM de gaussiana a convolucionar (2do smoothing) --> No.impar
+;	low_f   = acotacion inferior requerida en un paso intermedio en la
+;		  construccion del filtro ( ~ 0.2 - 0.3 valores razonables)
+
+;	!! ATENCION !! Para criterios de asignacion de valores a estas 
+;		       Keywords ver Apendice M.
+
+;OUTPUTS:
+;	ejemplo:  filtro = filtrop_jab(fima,512,npow,1,tsupport, $
+;			           boxcar1=boxcar1,boxcar2=boxcar2,low_f=low_f)
+
+;	El filtro que resulta esta centrado en le pixel (siz/2,siz/2)
+
+;----------------------------------------------------------------------------
+; Editado el 14 de Abril de 2009 a partir de "filter_jab.pro"
+; Jose A. Bonet
+;_____________________________________________________________________________
+
+; Calcula el espectro de potencia.
+
+  n2=siz/2  
+
+  p0 = abs(fimagen)^2	             ; Potencia de la senal observada
+  p0(n2,n2)=(total(p0(n2-1:n2+1,n2-1:n2+1))-p0(n2,n2))/8.  ;quito singul.origen
+  mask = tsupport eq 0	      ;Template defining freq. domain beyond the cutoff
+  npow0 = npow*filterfactor   ;Aplica factor de regularizacion
+
+; Suaviza el espectro de potencia y aplica la formula del filtro optimo de ruido
+
+  case 1 of
+    keyword_set(boxcar1): denom = float(smoothe(double(p0),boxcar1))
+    keyword_set(fwhm1):   denom = sconvol(p0,fwhm=fwhm1)           ;21) ;9)
+    else:                 denom = p0
+  endcase
+  filter = npow0/(denom > 1.e-35)
+  filter = (filter+especul(filter))/2.  ;corrects deviations from even function
+  filter = 1.-filter
+
+; Acota el filtro en el rango [low_f,1]
+
+  iii=0
+  if keyword_set(low_f) then iii=1
+  if iii then goto,salto1
+  otro:
+  low_f = return_low_f()
+  salto1:
+
+  filter0=filter
+  filter0(n2,n2)=1.
+  filter0=filter0*(filter0 gt low_f)*tsupport
+  filter0=filter0 < 1
+
+  if iii then goto,salto2
+  print,'****Filtro despues de PRIMER smoothing y ACOTACION****'
+  l = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]              ; contour levels
+  plot_contour,filter0,mask,l
+  print,'Probamos otro valor de low_f ? : press y/n'
+  start=get_kbrd(1)
+  if (start eq 'y') then goto,otro
+  salto2:
+
+; Suprime picos y smoothing adicional para tener transicion suave a cero
+
+;  filter0 = region_growth(filter0,n2)
+  filter0 = central_object(filter0)
+  case 1 of
+   keyword_set(boxcar2): filter0=float(smoothe(double(filter0),boxcar2))*tsupport
+   keyword_set(fwhm2):   filter0=sconvol(filter0,fwhm=fwhm2) * tsupport
+   else:		   filter0=filter0 * tsupport
+  endcase
+
+  if iii then goto,salto3
+  print,'****Filtro despues de SEGUNDO smoothing****'
+;  l = [0.01,0.025,0.05,0.1,0.2,0.4,0.6,0.8,0.9,1.0]           ;contour levels
+  l = [0.001,0.01,0.05,0.1,0.2,0.4,0.6,0.8,0.9,1.0]           ;contour levels
+  plot_contour,filter0,mask,l
+  print,'Probamos otro valor de low_f ? : press y/n'
+  start=get_kbrd(1)
+  if (start eq 'y') then goto,otro
+  salto3:
+
+return,filter0
+
+end
+
+;******************************************************************
+
+function filtrop_IMaX,p0,siz,npow,filterfactor,tsupport,boxcar1=boxcar1,$
+                         boxcar2=boxcar2,fwhm1=fwhm1,fwhm2=fwhm2,low_f=low_f
+
+; Rutina basada en "filtrop_jab.pro". Aqui un espectro de potencia medio
+; es un parametro input.
+
+; Esta rutina genera un filtro optimo de ruido como el descrito en 
+; Brault & White (1971), A&A 13,169 (Ver tambien Apendice M)
+; El proceso incluye dos procesos de smoothing. Primero se suaviza el espectro
+; de potencia original para atenuar sus inestabilidades estadisticas. A conti-
+; nuacion, se calcula el filtro mediante su formula analitica y se acota el
+; resultado inferiormente de modo que solo se preservan valores > low_f >= 0.
+; El salto de discontinuidad que genera este corte en el nivel low_f se suaviza 
+; en un segundo proceso de smoothing para conseguir una caida suave a cero del
+; filtro hasta la frecuancia cutoff y asi mismo atenuar posibles picos
+; remanentes.
+; Los procesos de smoothing se hacen opcionalmente mediante gausianas o boxcars
+; segun las 2 keywords que se suministran de entre: (boxcar1, fwhm1) y 
+; (boxcar2, fwhm2). Si se omiten estas keywords, el proceso se realiza sin
+; ningun smoothing.
+; El nivel de acotacion inferior se suministra mediante el keyword low_f. Si se
+; omite este keyword, la eleccion de su valor se hace interactivamente con el
+; raton al correr el programa.
+
+;INPUTS:
+;	p0   = promedio de espectros de potencia de todas las "imagenes normalizadas"
+;              y fuertemente apodizadas, de un barrido en lambdas y estados de 
+;              polarizacion (origen en el centro del array).
+;	siz  = dimension de p0. Ha de ser un numero par; de otra forma no 
+;              trabaja bien la sentencia:
+;                   filter = (filter+especul(filter))/2.
+;	       La funcion "filter" ha de estar centrada en el pixel (siz/2,siz/2)
+;	npow = nivel de potencia del ruido calculado por "level_of_noise_IMaX.pro".
+;	filterfactor = parametro de regularizacion. Factor multiplicativo que eleva
+;                      artificialmente el nivel de ruido para forzar un filtro de 
+;                      ruido mas severo.
+;	tsupport    = mascara definiendo el dominio de frec. hasta la cutoff
+
+;	KEYWORDS para smoothing y acotacion del filtro:
+;	boxcar1 = tama\~no caja a convolucionar   (1er smoothing) --> No.impar
+;	boxcar2 = tama\~no caja a convolucionar   (2do smoothing) --> No.impar
+;	fwhm1   = FWHM de gaussiana a convolucionar (1er smoothing) --> No.impar
+;	fwhm2   = FWHM de gaussiana a convolucionar (2do smoothing) --> No.impar
+;	low_f   = acotacion inferior requerida en un paso intermedio en la
+;		  construccion del filtro ( ~ 0.2 - 0.3 valores razonables)
+
+;	!! ATENCION !! Para criterios de asignacion de valores a estas 
+;		       Keywords ver Apendice M.
+
+;OUTPUTS:
+;	ejemplo:  filtro = filtrop_jab(fima,512,npow,1,tsupport, $
+;			           boxcar1=boxcar1,boxcar2=boxcar2,low_f=low_f)
+
+;	El filtro que resulta esta centrado en le pixel (siz/2,siz/2)
+
+;----------------------------------------------------------------------------
+; Editado el 25 de Sept. de 2009 a partir de "filtrop_jab.pro"
+; Jose A. Bonet
+;_____________________________________________________________________________
+
+; Preliminar calculations
+
+  n2=siz/2  
+
+  p0(n2,n2)=(total(p0(n2-1:n2+1,n2-1:n2+1))-p0(n2,n2))/8.  ;quito singul.origen
+  mask = tsupport eq 0	      ;Template defining freq. domain beyond the cutoff
+  npow0 = npow*filterfactor   ;Aplica factor de regularizacion
+
+; Suaviza el espectro de potencia y aplica la formula del filtro optimo de ruido
+
+  case 1 of
+    keyword_set(boxcar1): denom = float(smoothe(double(p0),boxcar1))
+    keyword_set(fwhm1):   denom = sconvol(p0,fwhm=fwhm1)           ;21) ;9)
+    else:                 denom = p0
+  endcase
+  filter = npow0/(denom > 1.e-35)
+  filter = (filter+especul(filter))/2.  ;corrects deviations from even function
+  filter = 1.-filter
+
+; Acota el filtro en el rango [low_f,1]
+
+  iii=0
+  if keyword_set(low_f) then iii=1
+  if iii then goto,salto1
+  otro:
+  low_f = return_low_f()
+  salto1:
+
+  filter0=filter
+  filter0(n2,n2)=1.
+  filter0=filter0*(filter0 gt low_f)*tsupport
+  filter0=filter0 < 1
+
+  if iii then goto,salto2
+  print,'****Filtro despues de PRIMER smoothing y ACOTACION****'
+  l = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]              ; contour levels
+  plot_contour,filter0,mask,l
+  print,'Probamos otro valor de low_f ? : press y/n'
+  start=get_kbrd(1)
+  if (start eq 'y') then goto,otro
+  salto2:
+
+; Suprime picos y smoothing adicional para tener transicion suave a cero
+
+;  filter0 = region_growth(filter0,n2)
+  filter0 = central_object(filter0)
+  case 1 of
+   keyword_set(boxcar2): filter0=float(smoothe(double(filter0),boxcar2))*tsupport
+   keyword_set(fwhm2):   filter0=sconvol(filter0,fwhm=fwhm2) * tsupport
+   else:		   filter0=filter0 * tsupport
+  endcase
+  filter0=filter0>0
+
+  if iii then goto,salto3
+  print,'****Filtro despues de SEGUNDO smoothing****'
+;  l = [0.01,0.025,0.05,0.1,0.2,0.4,0.6,0.8,0.9,1.0]           ;contour levels
+  l = [0.001,0.01,0.05,0.1,0.2,0.4,0.6,0.8,0.9,1.0]           ;contour levels
+  plot_contour,filter0,mask,l
+  print,'Probamos otro valor de low_f ? : press y/n'
+  start=get_kbrd(1)
+  if (start eq 'y') then goto,otro
+  salto3:
+
+return,filter0
+
+end
+
+;******************************************************************
+
+pro fill_gaps,im,x,y,valor
+
+; En la imagen "im" se buscan los bordes de un gap con ceros al que 
+; pertenece el punto (x,y). A im(x,y) se le asigna el resultado de 
+; interpolar los valores de "im" en los bordes. Este resultado se 
+; llama "valor".
+;_________________________________________________________________ 
+;Editado el 24 de Febrero de 2007
+;Jose A. Bonet
+;____________________________________________________________________
+
+  siz=size(im) & dimx=siz(1) & dimy=siz(2)
+   
+;Detecta bordes del gap en la direccion X  
+  i=0  &  next=x
+  while im(next,y) eq 0 and next ne 0 do begin
+    i=i+1
+    next=x-i
+  endwhile
+  x1=next
+  i=0  &  next=x
+  while im(next,y) eq 0 and next ne dimx-1 do begin
+    i=i+1
+    next=x+i
+  endwhile
+  x2=next
+;Detecta bordes del gap en la direccion Y  
+  i=0  &  next=y    
+  while im(x,next) eq 0 and next ne 0 do begin
+    i=i+1
+    next=y-i
+  endwhile
+  y1=next
+  i=0  &  next=y
+  while im(x,next) eq 0 and next ne dimy-1 do begin
+    i=i+1
+    next=y+i
+  endwhile
+  y2=next
+
+;Interpola en X e Y
+  case 1 of
+    x1 ne 0 and x2 ne dimx-1 :begin
+       valorx=im(x1,y)+((im(x2,y)-im(x1,y))/(x2-x1))*(x-x1)
+       end
+    x1 eq 0 and x2 eq dimx-1 :valorx=0
+    x1 eq 0 and x2 ne dimx-1 :valorx=im(x2,y)
+    x1 ne 0 and x2 eq dimx-1 :valorx=im(x1,y)
+  endcase
+  case 1 of
+    y1 ne 0 and y2 ne dimy-1 :begin
+       valory=im(x,y1)+((im(x,y2)-im(x,y1))/(y2-y1))*(y-y1)
+       end
+    y1 eq 0 and y2 eq dimy-1 :valory=0
+    y1 eq 0 and y2 ne dimy-1 :valory=im(x,y2)
+    y1 ne 0 and y2 eq dimy-1 :valory=im(x,y1)
+  endcase
+  if valorx eq 0 or valory eq 0 then begin
+    nv=1.
+  endif else begin
+    nv=2.
+  endelse
+  valor = (valorx+valory)/nv
+
+;print,x1,x2,valorx,y1,y2,valory,valor
+  
+end 
+
+;*******************************************************************
+
+pro profiles_XY,ima
+
+;Given an image "ima" plots of profiles in sections X and Y are displayed, respectively.
+;The sections correspond to those intersected in the point selected with the mouse.
+;______________________________________________________________________________
+
+;Edited on 1-Oct-2009 (IAC)
+;Jose A. Bonet
+;______________________________________________________________________________
+
+  dimx=(size(ima))(1)  &  dimy=(size(ima))(2)
+  nx=fix(dimx/2)*2  &  ny=fix(dimy/2)*2
+  ima2=ima(0:nx-1,0:ny-1)
+  ima2=rebin(ima2,nx/2,ny/2)
+  ma=max(ima2)  &  mi=min(ima2)
+  xxx=findgen(nx/2)*2
+  yyy=findgen(ny/2)*2
+  window,5,xs=nx/2,ys=ny/2,xpos=0,ypos=600
+  tvscl,ima2
+  ;profiles,boxx
+   print,'***Interactive selection of rows and columns for display'
+   print,'   Left button for selection, Right button for quit'
+  window,6,xs=800,ys=200,xpos=550,ypos=300,title='X-PROFILE'
+  window,7,xs=800,ys=200,xpos=550,ypos=0,title='Y-PROFILE'
+  wset,5
+  cursor,x,y,/device,/down  ;selects row and column for ploting
+  while (!err eq 1) do begin
+    wset,6
+    profilx=ima2(*,y)
+    plot,xxx,profilx
+    oplot,[2*x,2*x],[mi,ma],linestyle=0
+    wset,7
+    profily=ima2(x,*)
+    plot,yyy,profily
+    oplot,[2*y,2*y],[mi,ma],linestyle=0
+    wset,5
+    cursor,x,y,/device,/down
+  endwhile
+  wdelete,5,6,7
+
+end

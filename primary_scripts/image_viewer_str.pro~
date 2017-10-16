@@ -1,0 +1,313 @@
+pro image_viewer_str,path,outfilename
+
+; This program analyzes an IMaX/SUNRISE directory 
+; and generates a save file that can be used to 
+; study the contents of that day (data mining). 
+
+; Ends printing info on where flats, darks, pinholes
+; and PD sets are available
+
+; First run it with no flat and dark, then it can be run 
+; with flats and darks included. 
+
+;IDL>image_viewer_str,'/mnt/Iomega HDD/2009y_06m_09d/','set09_hdr.save'
+;IDL>image_viewer_str,'/media/FREECOM HDD/2009y_06m_09d/','set09_hdr.save'
+
+; NOTE: needs changing the name of indexing file manually
+
+; path is directory for data
+; outfilename is output save set
+
+; do indexing only first time is run. Output is indexing file
+
+;imas1=file_search(path,'*Camera_1*.fits',count=nima1)
+;imas2=file_search(path,'*Camera_2*.fits',count=nima2)
+
+;save,imas1,nima1,imas2,nima2,filename='imax_index_11thJune.save'
+
+;Indexing takes some time. Once this saved is generated
+;restore it instead of do the file_search again
+
+;restore,'imax_index_09thJune.save'
+
+;print,'Camera 1 images for this day is =', nima1
+;print,'Camera 2 images for this day is =', nima2
+
+pathr='~/IDLWorkspace71/kiruna_flight/data/index_sets/'
+;path='/mnt/hgfs/F_Windows/Fits/' ; data path
+
+restore,pathr+'imax_index_10thJune.save'      ; index file from image_viewer_str
+
+; substitute path files to path variable above
+
+for ind=0L,nima1-1L do begin
+        nlen=strlen(imas1[ind])
+        npos=strpos(imas1[ind],'2009')
+        imas1[ind]=path+strmid(imas1[ind],npos,nlen-npos)
+endfor
+
+for ind=0L,nima2-1L do begin
+        nlen=strlen(imas2[ind])
+        npos=strpos(imas2[ind],'2009')
+        imas2[ind]=path+strmid(imas2[ind],npos,nlen-npos)
+endfor
+
+;ind_first1=0L ; 
+;ind_last1=nima1  ;
+;ind_first2=0L ; 
+;ind_last2=nima2  ;
+
+; if you want to analyze in detail a subset, use this
+
+ind_first1=37006L ; 
+ind_last1=38248L  ; 
+ind_first2=36976L ; 
+ind_last2=38217L  ;
+
+nima1=ind_last1-ind_first1
+nima2=ind_last2-ind_first2
+
+; path for darks (if available)
+; darks are very stable
+
+; if no darks are available 
+dc1=fltarr(1024,1024)
+dc2=fltarr(1024,1024)
+
+; if darks are available use this
+;pathd='/home/vmp/IDLWorkspace/kiruna_flight/data/firstset/'
+;restore,pathd+'0906509_dc_set1.save'
+
+; restore flats (if available)
+
+;restore,'flats_DATA_09_set1.save'
+
+; initialize arrays (a description is available in imax_hdr_str.pro)
+
+int1=fltarr(nima1)                 ; mean intensity central part
+sss1=fltarr(nima1)                 ; standar deviation central part
+time1=fltarr(nima1)                ; time of given image
+timerun1=fltarr(nima1)             ; time at which observing sequence started
+imgacst1=fltarr(nima1)             ; time at which observing cycle started
+imgacen1=fltarr(nima1)             ; time at which observing cycle ended 
+xpoint1=fltarr(nima1)              ; x coordinate solar pointing
+ypoint1=fltarr(nima1)              ; y coordinate solar pointing
+f2m1=fltarr(nima1)                 ; F2 Mechanism (identifies darks and pinholes)
+cwl1=fltarr(nima1)                 ; CWS status (lock is good)
+pss1=fltarr(nima1)                 ; pointing system (identifies flats)
+pdp1=fltarr(nima1)                 ; phase diversity  
+nwavel1=fltarr(nima1)              ; number of wavelengths
+nacc1=fltarr(nima1)                ; numer of accumulations 
+npol1=fltarr(nima1)                ; number of polarizations
+dwavel1=fltarr(nima1)              ; positions of wavelengths from line center
+polst1=fltarr(nima1)               ; polarization state of current frame
+lamst1=fltarr(nima1)               ; wavelength state of current frame
+ettemp1=fltarr(nima1)              ; etalon temperature
+lcvrtemp1=fltarr(nima1)            ; LCVRs temperature
+doubltemp1=fltarr(nima1)           ; Doublets temperature
+acoef1=fltarr(nima1)               ; wavelength calibration coefficient
+obsmod1=fltarr(nima1)              ; observing mode
+sscpar1=fltarr(nima1)              ; SSC sequential counter
+numcycl1=fltarr(nima1)             ; cycle number
+numobse1=fltarr(nima1)             ; observing sequence number
+
+; next is the same but for Cam 2
+
+int2=fltarr(nima2)
+sss2=fltarr(nima2)
+time2=fltarr(nima2)
+timerun2=fltarr(nima2)
+imgacst2=fltarr(nima2)
+imgacen2=fltarr(nima2)
+xpoint2=fltarr(nima2)
+ypoint2=fltarr(nima2)
+f2m2=fltarr(nima2)
+cwl2=fltarr(nima2)
+pss2=fltarr(nima2)
+pdp2=fltarr(nima2)
+nwavel2=fltarr(nima2)
+nacc2=fltarr(nima2)
+npol2=fltarr(nima2)
+dwavel2=fltarr(nima2)
+polst2=fltarr(nima2)
+lamst2=fltarr(nima2)
+ettemp2=fltarr(nima2)
+lcvrtemp2=fltarr(nima2)
+doubltemp2=fltarr(nima2)
+acoef2=fltarr(nima2)
+obsmod2=fltarr(nima1)
+sscpar2=fltarr(nima2)
+numcycl2=fltarr(nima2)
+numobse2=fltarr(nima2)
+
+for ind=ind_first1,ind_last1-1L do begin
+	iind=ind-ind_first1
+	print,'  Image=',ind
+	ima=float(readfits(imas1[ind],hdr))
+	imax_hdr_str,hdr,hdrstr
+	ss1=hdrstr.sz1 ; better be 1024
+	ss2=hdrstr.sz2
+	ima=ima-dc1
+	nlamb=hdrstr.n_wave-1
+	npola=hdrstr.pol_stat-1
+
+;	this is used only if flats are available
+;	ima=ima/ff1[*,*,nlamb,npola]
+
+	int1[iind]=mean(ima[ss1/2-ss1/4:ss1/2+ss1/4,ss2/2-ss2/4:ss2/2+ss2/4])	
+	sss1[iind]=stdev(ima[ss1/2-ss1/4:ss1/2+ss1/4,ss2/2-ss2/4:ss2/2+ss2/4])	
+	print,'Contrast Cam1 is=',sss1[iind]/int1[iind]
+	time1[iind]=hdrstr.time
+	timerun1[iind]=hdrstr.time_run
+	imgacst1[iind]=hdrstr.img_acst
+	imgacen1[iind]=hdrstr.img_acen
+	xpoint1[iind]=hdrstr.xcen
+	ypoint1[iind]=hdrstr.ycen
+	f2m1[iind]=hdrstr.f2_mech
+	cwl1[iind]=hdrstr.cw_loop
+	pss1[iind]=hdrstr.ps_state
+	pdp1[iind]=hdrstr.pd_plate
+	nwavel1[iind]=hdrstr.num_wave
+	nacc1[iind]=hdrstr.num_accu
+	npol1[iind]=hdrstr.num_pola
+	dwavel1[iind]=hdrstr.d_wave
+	polst1[iind]=hdrstr.pol_stat
+	lamst1[iind]=hdrstr.lam_stat
+	ettemp1[iind]=hdrstr.etal_tem
+	lcvrtemp1[iind]=hdrstr.rocl_tem
+	doubltemp1[iind]=hdrstr.etad_tem
+	acoef1[iind]=hdrstr.etal_aco
+	obsmod1[iind]=hdrstr.obs_mode
+	sscpar1[iind]=hdrstr.ssc
+	numobse1[iind]=hdrstr.num_obse
+	numcycl1[iind]=hdrstr.num_cycl
+	tvwin,rebin(ima,512,512)
+endfor
+stop
+
+for ind=ind_first2,ind_last2-1L do begin
+	iind=ind-ind_first2
+	print,'  Image=',ind
+	ima=float(readfits(imas2[ind],hdr))
+	imax_hdr_str,hdr,hdrstr
+	ima=ima-dc2
+	nlamb=hdrstr.n_wave-1
+	npola=hdrstr.pol_stat-1
+
+;	this is used only if flats are available
+;	ima=ima/ff2[*,*,nlamb,npola]
+
+	int2[iind]=mean(ima[ss1/2-ss1/4:ss1/2+ss1/4,ss2/2-ss2/4:ss2/2+ss2/4])	
+	sss2[iind]=stdev(ima[ss1/2-ss1/4:ss1/2+ss1/4,ss2/2-ss2/4:ss2/2+ss2/4])	
+	print,'Contrast Cam2 is=',sss2[iind]/int2[iind]
+	time2[iind]=hdrstr.time
+	timerun2[iind]=hdrstr.time_run
+	imgacst2[iind]=hdrstr.img_acst
+	imgacen2[iind]=hdrstr.img_acen
+	xpoint2[iind]=hdrstr.xcen
+	ypoint2[iind]=hdrstr.ycen
+	f2m2[iind]=hdrstr.f2_mech
+	cwl2[iind]=hdrstr.cw_loop
+	pss2[iind]=hdrstr.ps_state
+	pdp2[iind]=hdrstr.pd_plate
+	nwavel2[iind]=hdrstr.num_wave
+	nacc2[iind]=hdrstr.num_accu
+	npol2[iind]=hdrstr.num_pola
+	dwavel2[iind]=hdrstr.d_wave
+	polst2[iind]=hdrstr.pol_stat
+	lamst2[iind]=hdrstr.lam_stat
+	ettemp2[iind]=hdrstr.etal_tem
+	lcvrtemp2[iind]=hdrstr.rocl_tem
+	doubltemp2[iind]=hdrstr.etad_tem
+	acoef2[iind]=hdrstr.etal_aco
+	obsmod2[iind]=hdrstr.obs_mode
+	sscpar2[iind]=hdrstr.ssc
+	numobse2[iind]=hdrstr.num_obse
+	numcycl2[iind]=hdrstr.num_cycl
+	tvwin,rebin(ima,512,512)
+endfor
+stop
+
+save,ss1,ss2,$
+int1,sss1,time1,timerun1,imgacst1,imgacen1,xpoint1,ypoint1,f2m1,cwl1,pss1,pdp1,$
+nwavel1,nacc1,npol1,dwavel1,polst1,lamst1,ettemp1,lcvrtemp1,doubltemp1,acoef1, $
+obsmod1,sscpar1,numobse1,numcycl1,  $
+int2,sss2,time2,timerun2,imgacst2,imgacen2,xpoint2,ypoint2,f2m2,cwl2,pss2,pdp2,$
+nwavel2,nacc2,npol2,dwavel2,polst2,lamst2,ettemp2,lcvrtemp2,doubltemp2,acoef2, $
+obsmod2,sscpar2,numobse2,numcycl2,filename=outfilename
+
+; do some data mining
+; find obsenum for flats darks pinholes and PD
+; writes outputfilename
+
+openw,1,strmid(outfilename,0,strpos(outfilename,'.s'))+'.txt'
+
+printf,1,path
+printf,1,' '
+
+; flats
+
+ddf=where(pss1 eq 3,nnf)
+if (nnf gt 0) then begin
+	obsef=numobse1[ddf[0]]
+	for ind=1,nnf-1 do begin
+		if (numobse1[ddf[ind]] ne  obsef[sizeof(obsef[*])-1]) then $
+		obsef=[obsef,numobse1[ddf[ind]]]
+	endfor
+	print,'Flats in series (observations and PD) =',obsef
+	printf,1,'Flats in series (observations and PD) =',obsef
+endif else begin
+	print,'No flats in series'
+	printf,1,'No flats in series'
+endelse
+
+;darks
+
+ddd=where(f2m1 eq 3,nnd)
+if (nnd gt 0) then begin
+	obsed=numobse1[ddd[0]]
+	for ind=1,nnd-1 do begin
+		if (numobse1[ddd[ind]] ne  obsed[sizeof(obsed[*])-1]) then $
+		 obsed=[obsed,numobse1[ddd[ind]]]
+	endfor
+	print,'Darks in series (observations and PD) =',obsed
+	printf,1,'Darks in series (observations and PD) =',obsed
+endif else begin
+	print,'No darks in series'
+	printf,1,'No darks in series'
+endelse
+
+;pinholes
+
+ddp=where(f2m1 eq 2,nnp)
+if (nnp gt 0) then begin
+	obsep=numobse1[ddp[0]]
+	for ind=1,nnp-1 do begin
+		if (numobse1[ddp[ind]] ne  obsep[sizeof(obsep[*])-1]) then $ 
+		obsep=[obsep,numobse1[ddp[ind]]]
+	endfor
+	print,'Pinholes in series (observations and PD) =',obsep
+	printf,1,'Pinholes in series (observations and PD) =',obsep
+endif else begin
+	printf,1,'No pinholes in series'
+endelse
+
+; PD sets
+
+ddpd=where(pdp1 eq 1,nnpd)
+if (nnpd gt 0) then begin
+	obsepd=numobse1[ddpd[0]]
+	for ind=1,nnpd-1 do begin
+		if (numobse1[ddpd[ind]] ne  obsepd[sizeof(obsepd[*])-1]) then $
+		obsepd=[obsepd,numobse1[ddpd[ind]]]
+	endfor
+	print,'PD in series =',obsepd
+	printf,1,'PD in series =',obsepd
+endif else begin
+	print,'No PD in series'
+	printf,1,'No PD in series'
+endelse
+
+close,1
+
+end
