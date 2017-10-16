@@ -73,6 +73,5 @@ lox=0 & hix=0 & loy=0 & hiy=0   ;para trabajar con la imagen completa
   fimam=shift(fft((imam-sus)*www,-1),dimx2,dimy2)
   powm=(abs(fimam))^2
 
-;stop
 
 end

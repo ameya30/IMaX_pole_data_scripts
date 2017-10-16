@@ -88,7 +88,7 @@ end
 ; El raton hace de borrador: 
 ;     left button para borrar; right button para reponer valor original
 ;     center button to quit.
-; El tamaño del rubber-spot es regulable.
+; El tamaï¿½o del rubber-spot es regulable.
 ; La imagen que resulta del proceso, "imcorr", puede realimentar la rutina
 ; a traves de la Keyword IMCORR=imcorr, de manera que en otra sesion se 
 ; pueda continuar el proceso en donde se dejo.
@@ -98,7 +98,7 @@ end
 ;              Incluso si se aplica la rutina reiteradamente haciendo 
 ;              feedbacks, imori es siempre la misma
 
-; !!!! El tamaño de la caja de trabajo se puede MODIFICAR POR EDITOR!!!!!!
+; !!!! El tamaï¿½o de la caja de trabajo se puede MODIFICAR POR EDITOR!!!!!!
 
 ;KEYWORDS:
 ;      [IMCORR=imcorr] = hace de entrada y salida. La primera vez que se 
@@ -109,7 +109,7 @@ end
 ;      [MASK=mask] = mascara binaria que define las areas borradas en la 
 ;                    imagen "imori" con ceros. En procesos con feedback
 ;                    esta Keyword funciona de forma analoga a IMCORR.
-;      [RUBW=rubw] = tamaño del rubber-spot que se asume de entrada. Se
+;      [RUBW=rubw] = tamaï¿½o del rubber-spot que se asume de entrada. Se
 ;               puede modificar opcionalmente durante el proceso. En la 
 ;               salida guarda el ultimo valor utilizado por si se quiere 
 ;               utilizar en el feeback
@@ -127,7 +127,7 @@ pro rubber,imori,IMCORR=imcorr,MASK=mask,RUBW=rubw
 
 ;!!!! A MODIFICAR POR EDITOR !!!!!!!
 
-sizbx0=200  &  sizby0=200  ;tamaño de la de trabajo a extraer
+sizbx0=200  &  sizby0=200  ;tamaï¿½o de la de trabajo a extraer
 ;______________________________________________
 
 rimori=imori
@@ -273,11 +273,11 @@ end
 
 pro recover_even_function,f_half,f_par
 
-;Dados el 1º y 4º cuadrantes de una funcion par, reconstruye
-;la informacion en el 2º y 3er cuadrantes.
+;Dados el 1ï¿½ y 4ï¿½ cuadrantes de una funcion par, reconstruye
+;la informacion en el 2ï¿½ y 3er cuadrantes.
 ;
 ;INPUT:
-;    f_half = imagen con 1º y 4º cuadrantes, de dimension
+;    f_half = imagen con 1ï¿½ y 4ï¿½ cuadrantes, de dimension
 ;             (dimx/2,dimy) y con el origen de coordenadas
 ;             en (0,dimy/2).
 ;OUTPUT:
@@ -392,7 +392,7 @@ endelse
 
 if option_log eq 0 then pows=pows<threshold
 
-;Extracts 1º y 4º quadrants of the power.
+;Extracts 1ï¿½ y 4ï¿½ quadrants of the power.
 powhalf=pows(x0:*,*)
 if option_log ne 0 then powhalf=alog10(powhalf)
 if option_log eq 0 then begin

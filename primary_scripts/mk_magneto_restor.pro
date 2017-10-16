@@ -8,18 +8,23 @@ pro mk_magneto_restor,obsen,cyclen,maskfile,longitudinal=longitudinal,file_out
 ;IDL>mk_magneto_restor,225,100,'masks_225_100.save',longitudinal=0 
 
 ; longitudinal=1 should be used for L12-2 or L3-2
-path_out='saves_May31st/' + file_out
+
+path_out='saves_Oct11/' + file_out
 if n_elements(longitudinal) eq 0 then longitudinal=0
 
 path  = '/data/sunrise/2009/IMaX/level0.0/2009_06_12/2009_06_12_16/' ; path to data to restore
-pathr = 'sets_index/'   ;path to sets and inds 
-pathd = 'darks/'        ;path to darks
-pathf = 'flats_stage4/' ;path to rem_lin flats
-
-restore, pathd + 'dar_12thJune91hr.sav', /v
-restore, pathf + 'srage4_flat_out.sav', /v               ;new flats from rem_lin_flat
+;pathr = 'sets_index/'   ;path to sets and inds
+pathr = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/sets_inds/' 
+;pathd = 'darks/'        ;path to darks
+;pathf = 'flats_stage4/' ;path to rem_lin flats
+pathf = 'at3/'
+;restore, pathd + 'dar_12thJune91hr.sav', /v
+restore, 'dar_12thJune_tr.sav', /v
+;restore, pathf + 'srage4_flat_out.sav', /v
+restore, pathf + 'stage4_flat_out_at3.sav', /v               ;new flats from rem_lin_flat
 restore, pathr + 'set_12thJune16hr.sav', /v               ;restore housekeepings of data not dark or flats?
-restore, pathf + 'pref_factors_stage4_flat_out.sav', /v ;restore prefilter factors
+;restore, pathf + 'pref_factors_stage4_flat_out.sav', /v ;restore prefilter factors
+restore, pathf + 'pref_factors_stage4_flat_out_at3.sav', /v ;restore prefilter factors
 
 ;; overwrite ff1 and ff2 with flats that do not have low freq fringes
 ;ff1 = readfits('cam1_flat_full_no_med.fits')
@@ -65,6 +70,7 @@ oplot,time2[dd2],int2[dd2]-1000,psym=2
 
 ;imas1=file_search(path,'*Camera_1*.fits',count=nima1)
 ;imas2=file_search(path,'*Camera_2*.fits',count=nima2)
+;restore, pathr + 'ind_12thJune16hr.sav'
 restore, pathr + 'ind_12thJune16hr.sav'
 
 ; substitute path files to path variable above
@@ -195,19 +201,19 @@ option_fringes=2  ;2  ;1   ;0
 
 for ind=0,n_lambda-1 do begin
         for jnd=0,n_pol-1 do begin
-		print,'Doing restoration for lambda and pol...............',ind,jnd
-     		im01=iim1(*,*,ind,jnd)
+          print,'Doing restoration for lambda and pol...............',ind,jnd
+          im01=iim1(*,*,ind,jnd)
 
-		imr1=deconvolution_IMaX7(im01,ctel,inter,option_fringes,imnr1,maskf=mask1,maskg=maskgd1) ; global psf
+		      imr1=deconvolution_IMaX7(im01,ctel,inter,option_fringes,imnr1,maskf=mask1,maskg=maskgd1) ; global psf
      		
-		iim1n(*,*,ind,jnd)=imnr1 ; not restored
-     		iim1(*,*,ind,jnd)=imr1   ; restored
+		      iim1n(*,*,ind,jnd)=imnr1 ; not restored
+          iim1(*,*,ind,jnd)=imr1   ; restored
 
-     		im02=iim2(*,*,ind,jnd)
+     		  im02=iim2(*,*,ind,jnd)
 
-		imr2=deconvolution_IMaX7(im02,ctel,inter,option_fringes,imnr2,maskf=mask2,maskg=maskgd2) ; global psf
-     		iim2n(*,*,ind,jnd)=imnr2 ; not restored
-     		iim2(*,*,ind,jnd)=imr2   ; restored
+		      imr2=deconvolution_IMaX7(im02,ctel,inter,option_fringes,imnr2,maskf=mask2,maskg=maskgd2) ; global psf
+          iim2n(*,*,ind,jnd)=imnr2 ; not restored
+          iim2(*,*,ind,jnd)=imr2   ; restored
 	endfor
 endfor
 
