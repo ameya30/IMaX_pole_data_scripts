@@ -9,7 +9,7 @@ pro mk_magneto_restor,obsen,cyclen,maskfile,longitudinal=longitudinal,file_out
 
 ; longitudinal=1 should be used for L12-2 or L3-2
 
-path_out='saves_Oct11/' + file_out
+path_out='/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/saves_Oct11/' + file_out
 if n_elements(longitudinal) eq 0 then longitudinal=0
 
 path  = '/data/sunrise/2009/IMaX/level0.0/2009_06_12/2009_06_12_16/' ; path to data to restore
@@ -17,9 +17,9 @@ path  = '/data/sunrise/2009/IMaX/level0.0/2009_06_12/2009_06_12_16/' ; path to d
 pathr = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/sets_inds/' 
 ;pathd = 'darks/'        ;path to darks
 ;pathf = 'flats_stage4/' ;path to rem_lin flats
-pathf = 'at3/'
+pathf = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/at3/'
 ;restore, pathd + 'dar_12thJune91hr.sav', /v
-restore, 'dar_12thJune_tr.sav', /v
+restore, '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/dar_12thJune_tr.sav', /v
 ;restore, pathf + 'srage4_flat_out.sav', /v
 restore, pathf + 'stage4_flat_out_at3.sav', /v               ;new flats from rem_lin_flat
 restore, pathr + 'set_12thJune16hr.sav', /v               ;restore housekeepings of data not dark or flats?
