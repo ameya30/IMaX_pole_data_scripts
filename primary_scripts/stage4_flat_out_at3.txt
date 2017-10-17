@@ -1,0 +1,37 @@
+Images are of size=         936         936
+Number of observations of Cam1 for this observing sequence=        1044
+Number of observations of Cam2 for this observing sequence=        1044
+Using fit range and smoothing factor of=       4       3
+Intensities for Cam1=      6535.88      5162.66      5405.56      7319.43
+      8253.86
+      6765.80      5203.71      5584.66      7482.73      8400.04
+      7744.22      5868.80      6398.68      8511.58      9534.46
+      7592.25      5696.54      6285.05      8312.30      9279.97
+Intensities for Cam2=      6505.75      5177.85      5130.52      7066.19
+      8083.92
+      6532.50      5056.01      5133.66      7002.50      7963.53
+      5907.64      4497.42      4651.43      6303.30      7136.22
+      6060.64      4577.07      4785.99      6454.25      7295.31
+a coefficient for this flat=    -0.803893
+Equator equivalent mu is (real mu is smaller)=      0.93945898
+Observations in West side
+Lambda shift between flats (disk center) and observations (some mu)=
+     0.011993149
+New wavelength sampling points for flats=    -0.068006849    -0.028006850
+     0.051993148     0.091993147      0.23899315
+Voltage difference with cal day (volts) =       301.85459
+Voltages for this flat=       2159.9188       2279.2689       2517.9692
+       2637.3193       3075.9311
+Prefilter factors are =      0.94410266      0.95536057      0.97807916
+      0.98631494       1.0000000
+FWHM of Fe I 5250.2 over flat FOV and rms for Cam1 (mA)=     0.112888
+   0.00286989
+FWHM of Fe I 5250.2 over flat FOV and rms for Cam2 (mA)=     0.111969
+   0.00268247
+Line center of Fe I 5250.2 over flat FOV and rms for Cam1=     0.523105
+    0.0142672
+Line center of Fe I 5250.2 over flat FOV and rms for Cam2=     0.516701
+    0.0124954
+Maximum blueshift at corners (mA)=     0.035363970
+Mean blueshift over FOV (mA) =     0.010629689
+Maximum theoretical blueshift (mA)=     0.028596193

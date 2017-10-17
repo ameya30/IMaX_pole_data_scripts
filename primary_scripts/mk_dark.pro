@@ -32,12 +32,14 @@ print, fx, fy
 ;
 
 ;path  = '/data/sunrise/2009/IMaX/level0.0/2009_06_12/2009_06_12_18/'  ; data path
-path  = '/data/waller/IMaX.imax_pros_011110/imax8910hr'
-pathr = '/data/waller/IMaX/imax_pros_011110/sets_index/'
+;path  = '/data/waller/IMaX.imax_pros_011110/imax8910hr'
+;pathr = '/data/waller/IMaX/imax_pros_011110/sets_index/'
+path = 'tempy/'
 
-restore, pathr + 'ind_12thJune91hr.sav'                ; index file from image_viewer_str
-restore, pathr + 'set_12thJune91hr.sav'                ; output file from image_viewer_str
-
+;restore, pathr + 'ind_12thJune91hr.sav'                ; index file from image_viewer_str
+;restore, pathr + 'set_12thJune91hr.sav'                ; output file from image_viewer_str
+restore, path + 'ind_12thJune_wdtest.sav'
+restore,'12th_day_test.save'
 ; substitute path files to path variable above
 
 ;for ind = 0L, nima1-1L do begin
@@ -54,8 +56,8 @@ restore, pathr + 'set_12thJune91hr.sav'                ; output file from image_
 
 ; now we continue as usual
 
-outfilename = '/data/waller/IMaX/imax_pros_011110/darks/dar_12thJune91hr.sav'      ; idl save set with darks. Output file
-
+;outfilename = '/data/waller/IMaX/imax_pros_011110/darks/dar_12thJune91hr.sav'      ; idl save set with darks. Output file
+outfilename = 'dar_12thJune_tr.sav'
 ; initialize darks
 
 dc1  = fltarr(ss1, ss2)

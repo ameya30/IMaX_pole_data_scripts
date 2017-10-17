@@ -36,7 +36,7 @@ pro image_viewer_str, path, outfilename
 allFiles1 = file_search(path, '*Camera_1*.fits.gz', count=oriCount1)
 allFiles2 = file_search(path, '*Camera_2*.fits.gz', count=oriCount2)
 print, path+'*Camera_1 *.fits.gz'
-save, allFiles1, oriCount1, allFiles2, oriCount2, filename = 'sets_index/ind_12thJune16hr.sav' 
+save, allFiles1, oriCount1, allFiles2, oriCount2, filename = 'tempy/ind_11thJune_wdtest.sav' 
 ;---------------------------------------------------------------------------;
 ;Indexing takes some time. Once this saved is generated
 ;restore it instead of do the file_search again
@@ -176,6 +176,8 @@ for ind = ind_first1, ind_last1 - 1 do begin
 	numobse1[iind]   = hdrstr.num_obse
 	numcycl1[iind]   = hdrstr.num_cycl
 ;	tvwin, rebin(ima, 512, 512)
+
+  
 endfor
 
 

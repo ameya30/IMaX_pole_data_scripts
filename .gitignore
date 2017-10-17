@@ -107,3 +107,6 @@ ENV/
 # sav
 *.sav
 *.save
+
+# idl temp files
+*.pro~

@@ -42,14 +42,20 @@ pro prepare_deconvol,obsen,cyclen,save_in=save_in,save_out=save_out
 if (obsen ne 0 and cyclen ne 0) then begin ; image readout
 
 ;path  = '/data/sunrise/2009/IMaX/level0.0/2009_06_12/2009_06_12_16/' ; path to data to restore
-pathr = 'sets_index/'   ;path to sets and inds 
-pathd = 'darks/'        ;path to darks
-pathf = 'flats_stage4/' ;path to rem_lin flats
-
-restore, pathd + 'dar_12thJune91hr.sav', /v
-restore, pathf + 'stage4_flat_out.sav', /v           ;new flats from rem_lin_flat
+;pathr = 'sets_index/'   ;path to sets and inds 
+;pathd = 'darks/'        ;path to darks
+;pathf = 'flats_stage4/' ;path to rem_lin flats
+pathf = 'at3/'
+;pathf = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/stage4_flat/'
+pathr = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/sets_inds/'
+;restore, pathd + 'dar_12thJune91hr.sav', /v
+;restore, pathf + 'stage4_flat_out.sav', /v           ;new flats from rem_lin_flat
 restore, pathr + 'set_12thJune16hr.sav', /v           ;restore housekeepings of data not dark or flats?
-restore, pathf + 'pref_factors_stage4_flat_out.sav', /v ;restore prefilter factors
+;restore, pathf + 'pref_factors_stage4_flat_out.sav', /v ;restore prefilter factors
+
+restore,'dar_12thJune_tr.sav',/v
+restore, pathf+'stage4_flat_out_at3.sav'
+restore, pathf + 'pref_factors_stage4_flat_out_at3.sav'
 
 ;; overwrite ff1 and ff2 with flats that do not have low freq fringes
 ;ff1 = readfits('cam1_flat_full_no_med.fits')
@@ -118,6 +124,7 @@ for ind=0,n_lambda-1 do begin
 			print,'Image not found' 
 			return
 		endif else begin 
+		  print, imas1[indm1[ind,jnd]]
 			ima=readfits(imas1[indm1[ind,jnd]])
 			ima=ima[fx:fy,fx:fy]
 			ima=ima-dc1*float(n_accum)/float(nacd1) ; dark substraction

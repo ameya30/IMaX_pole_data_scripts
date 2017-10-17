@@ -1,0 +1,152 @@
+Cam1 image contrast is=      0.43929989
+Cam2 image contrast is=      0.46089511
+Cam1 image contrast is=      0.43920190
+Cam2 image contrast is=      0.46098530
+Cam1 image contrast is=      0.44313080
+Cam2 image contrast is=      0.45930528
+Cam1 image contrast is=      0.44208660
+Cam2 image contrast is=      0.46059415
+Cam1 image contrast is=      0.43740667
+Cam2 image contrast is=      0.46097414
+Cam1 image contrast is=      0.43709545
+Cam2 image contrast is=      0.46084627
+Cam1 image contrast is=      0.44066472
+Cam2 image contrast is=      0.45917240
+Cam1 image contrast is=      0.43926495
+Cam2 image contrast is=      0.46036899
+Cam1 image contrast is=      0.44278493
+Cam2 image contrast is=      0.46847749
+Cam1 image contrast is=      0.44334392
+Cam2 image contrast is=      0.46936627
+Cam1 image contrast is=      0.44775231
+Cam2 image contrast is=      0.46819240
+Cam1 image contrast is=      0.44752007
+Cam2 image contrast is=      0.46938684
+Cam1 image contrast is=      0.45084934
+Cam2 image contrast is=      0.47467393
+Cam1 image contrast is=      0.45070535
+Cam2 image contrast is=      0.47540934
+Cam1 image contrast is=      0.45448280
+Cam2 image contrast is=      0.47416188
+Cam1 image contrast is=      0.45349940
+Cam2 image contrast is=      0.47443254
+Cam1 image contrast is=      0.43779101
+Cam2 image contrast is=      0.46235232
+Cam1 image contrast is=      0.43756142
+Cam2 image contrast is=      0.46247379
+Cam1 image contrast is=      0.44053905
+Cam2 image contrast is=      0.46096803
+Cam1 image contrast is=      0.43962877
+Cam2 image contrast is=      0.46183327
+Only used continuum xtalk (last column)
+Continuum xtalk parameters for Cam1=      0.00000      0.00000      0.00000
+      0.00000      0.00000
+   -0.0138777   0.00668172   -0.0101407  -0.00964446  -0.00205792
+   -0.0396634   -0.0281539   -0.0359218   -0.0369920   -0.0327356
+   0.00734000   0.00107170   0.00885115   0.00703054   0.00280732
+Continuum xtalk parameters for Cam2=      0.00000      0.00000      0.00000
+      0.00000      0.00000
+   -0.0426122   -0.0625017   -0.0475152   -0.0453511   -0.0534942
+    0.0290434    0.0158167    0.0229489    0.0250877    0.0196470
+  -0.00639710  -0.00163946  -0.00735287  -0.00600186  -0.00459010
+Only used continuum xtalk (last column)
+Continuum xtalk parameters for Cam1 (not restored)=      0.00000      0.00000
+      0.00000      0.00000      0.00000
+   -0.0138789   0.00668085   -0.0101396  -0.00964606  -0.00205859
+   -0.0396621   -0.0281543   -0.0359221   -0.0369915   -0.0327375
+   0.00734222   0.00107043   0.00884828   0.00703051   0.00280699
+Continuum xtalk parameters for Cam2 (not restored)=      0.00000      0.00000
+      0.00000      0.00000      0.00000
+   -0.0426121   -0.0625036   -0.0475145   -0.0453507   -0.0534933
+    0.0290415    0.0158158    0.0229464    0.0250864    0.0196494
+  -0.00639976  -0.00163808  -0.00735397  -0.00600114  -0.00459049
+Camera 1/Camera 2 ratios=      1.16643      1.16245      1.21292      1.20971
+      1.18676
+Camera 1/Camera 2 ratios (not restored)=      1.16644      1.16245      1.21293
+      1.20972      1.18676
+Shift between Camera 2 and 1 is=      5.35244      5.34159      5.46074
+      5.48769      5.68282
+     -8.04600     -8.16874     -8.08388     -8.02677     -7.92034
+Shift between Camera 2 and 1 is (not restored)=      5.05272      4.98948
+      5.34774      5.31068      5.12097
+     -6.90534     -7.50134     -7.42435     -6.84610    -0.234399
+    Lambda ---  Polarization --- Cam1/Cam2  weight
+       0              1            0.411224
+       0              2            0.564286
+       0              3            0.484694
+       1              1            0.490816
+       1              2            0.533673
+       1              3            0.484694
+       2              1            0.423469
+       2              2            0.558163
+       2              3            0.472449
+       3              1            0.423469
+       3              2            0.576531
+       3              3            0.521429
+       4              1            0.417347
+       4              2            0.552041
+       4              3            0.490816
+    Lambda ---  Polarization --- Cam1/Cam2  weight (not restored)
+       0              1            0.356122
+       0              2            0.594898
+       0              3            0.490816
+       1              1            0.478571
+       1              2            0.521429
+       1              3            0.484694
+       2              1            0.356122
+       2              2            0.564286
+       2              3            0.466327
+       3              1            0.350000
+       3              2            0.588776
+       3              3            0.527551
+       4              1            0.350000
+       4              2            0.564286
+       4              3            0.503061
+Residual non-zero trends=       0       1    0.0015465084
+Residual non-zero trends=       0       2   0.00038384698
+Residual non-zero trends=       0       3    0.0012657991
+Residual non-zero trends=       1       1   0.00056809955
+Residual non-zero trends=       1       2   0.00066067748
+Residual non-zero trends=       1       3   0.00067924563
+Residual non-zero trends=       2       1   0.00045948929
+Residual non-zero trends=       2       2   0.00042585446
+Residual non-zero trends=       2       3    0.0013978871
+Residual non-zero trends=       3       1    0.0014820952
+Residual non-zero trends=       3       2   0.00040224730
+Residual non-zero trends=       3       3    0.0015264711
+Residual non-zero trends=       4       1   0.00035527468
+Residual non-zero trends=       4       2   0.00026700204
+Residual non-zero trends=       4       3   0.00028206761
+Residual non-zero trends (not restored)=       0       1    0.0027966480
+Residual non-zero trends (not restored)=       0       2   0.00047072074
+Residual non-zero trends (not restored)=       0       3    0.0013047129
+Residual non-zero trends (not restored)=       1       1   0.00068340545
+Residual non-zero trends (not restored)=       1       2   0.00056220950
+Residual non-zero trends (not restored)=       1       3   0.00067970073
+Residual non-zero trends (not restored)=       2       1   0.00097179341
+Residual non-zero trends (not restored)=       2       2   0.00044784450
+Residual non-zero trends (not restored)=       2       3    0.0013424141
+Residual non-zero trends (not restored)=       3       1    0.0026370472
+Residual non-zero trends (not restored)=       3       2   0.00044444740
+Residual non-zero trends (not restored)=       3       3    0.0015616672
+Residual non-zero trends (not restored)=       4       1   0.00038657434
+Residual non-zero trends (not restored)=       4       2   0.00026988374
+Residual non-zero trends (not restored)=       4       3   0.00029043607
+Substracted continuum polarization=       2       1     0.525616
+Substracted continuum polarization=       3       1     0.657827
+Substracted continuum polarization=       2       2     0.214135
+Substracted continuum polarization=       3       2     0.375027
+Substracted continuum polarization=       2       3     0.453456
+Substracted continuum polarization=       3       3     0.776425
+Substracted continuum polarization (not restored)=       2       1     0.454954
+Substracted continuum polarization (not restored)=       3       1     0.474825
+Substracted continuum polarization (not restored)=       2       2     0.249823
+Substracted continuum polarization (not restored)=       3       2     0.421941
+Substracted continuum polarization (not restored)=       2       3     0.408990
+Substracted continuum polarization (not restored)=       3       3     0.540286
+ad-hoc xtalk from V to Q is (not restored)=   -0.0990826    -0.133633
+    0.0969167     0.152084     0.124500
+ad-hoc xtalk from V to U is (not restored)=   -0.0840703    -0.114056
+  -0.00782214    0.0322103    0.0121941
+ad-hoc xtalk from V to Q used is (to both)=   0.00407124
+ad-hoc xtalk from V to U used is (to both)=   -0.0434345

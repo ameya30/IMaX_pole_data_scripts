@@ -15,19 +15,21 @@ openw, 1, strmid(outfilename, 0, strpos(outfilename,'.s'))+'.txt'
 
 ; path for darks. Needs to be changed manually !!!
 
-pathd = 'darks/'
-restore , pathd + 'dar_12thJune91hr.sav', /v
+;pathd = 'darks/'
+;restore , pathd + 'dar_12thJune91hr.sav', /v
+restore, 'dar_12thJune_tr.sav',/v
 print   ,    'Images are of size=', ndim, ndim
 printf  , 1, 'Images are of size=', ndim, ndim
 
 ;data path. Needs to be changed manually !!!
 
 ;path  = '/data/sunrise/2009/IMaX/level0.0/2009_06_12/2009_06_12_18/' ; data path
-pathr = 'sets_index/' ;path to set and index
+;pathr = 'sets_index/' ;path to set and index
 
-restore, pathr + 'ind_12thJune91hr.sav', /v      ; index file from image_viewer_str
-restore, pathr + 'set_12thJune91hr.sav', /v                ; output file from image_viewer_str
-
+;restore, pathr + 'ind_12thJune91hr.sav', /v      ; index file from image_viewer_str
+;restore, pathr + 'set_12thJune91hr.sav', /v                ; output file from image_viewer_str
+restore,'tempy/ind_12thJune_wdtest.sav',/v
+restore, '12th_day_test.save', /v
 ; substitute path files to path variable above
 
 ;for ind=0L,nima1-1L do begin

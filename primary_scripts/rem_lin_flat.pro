@@ -1,5 +1,5 @@
 pro rem_lin_flat,infilename,outfilename,use_gaussfit=use_gaussfit
-
+;@puff
 ; This program starts from flats produced by
 ; mk_flat and generates a new set of flats that 
 ; has no blueshift illumination effect of the spectral 
@@ -26,8 +26,10 @@ pro rem_lin_flat,infilename,outfilename,use_gaussfit=use_gaussfit
 
 ; Change housekeeping and output save set names to those you are using !!!!
 
-pathr = '/data/waller/IMaX/imax_pros_011110/sets_index/'
-patho = '/data/waller/IMaX/imax_pros_011110/flats_stage4/' 
+;pathr = '/data/waller/IMaX/imax_pros_011110/sets_index/'
+;patho = '/data/waller/IMaX/imax_pros_011110/flats_stage4/' 
+pathr = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/'
+patho = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/stg4/'
 ; output text file  
 
 openw,1,strmid(outfilename,0,strpos(outfilename,'.s'))+'.txt'
@@ -39,7 +41,8 @@ ndim=sizeofnew(ff1,1)
 print,'Images are of size=',ndim,ndim 
 printf,1,'Images are of size=',ndim,ndim 
 
-restore,pathr+'set_12thJune91hr.sav',/v ; housekeeping
+;restore,pathr+'set_12thJune91hr.sav',/v ; housekeeping
+restore,pathr+'12th_day_test.save',/v ; housekeeping
 
 dd1=where(numobse1 eq obsen,nobsen1)
 print,'Number of observations of Cam1 for this observing sequence=',nobsen1
@@ -243,7 +246,7 @@ printf,1,'a coefficient for this flat=',acf
 ; NEEDS ITERATION AS WE DO NOT KNOW WHERE WE POINTED !!!!
 
 ;a_diskc=-0.791d0 ; central meridiam estimation from log book
-
+a_diskc=-0.7919d0
 ;a_diskc=-0.771d0 ; central meridiam estimation from log book
 		 ; this is good for flat #1 the 13.
 
@@ -253,7 +256,7 @@ printf,1,'a coefficient for this flat=',acf
 
 ;a_diskc=acf      ; in case the flat was made where obsservations
                  ; are made, use this
-a_diskc = -0.7819217d0 
+;a_diskc = -0.7819217d0 
 
 diffa=a_diskc-acf  ; shift between flats and observations
 sintheta=diffa/0.035 ; +/- 35 mA is full limb solar rotation
@@ -371,6 +374,7 @@ printf,1,'Line center of Fe I 5250.2 over flat FOV and rms for Cam2=',mean(linc2
 ; bring wavelength center array to original dimension
 
 lmin1=puff(lmin1,red_fac)
+
 lmin2=puff(lmin2,red_fac)
 
 ; blueshift is monotonic, so do a lsqfit to a polynomial degree 3
