@@ -48,7 +48,7 @@ Continuum xtalk parameters for Cam2=      0.00000      0.00000      0.00000
       0.00000      0.00000
    -0.0435020   -0.0617677   -0.0472477   -0.0459528   -0.0536378
     0.0286006    0.0166630    0.0234163    0.0241858    0.0196803
-  -0.00666299  -0.00126831  -0.00673978  -0.00674876  -0.00464590
+  -0.00666299  -0.00126832  -0.00673978  -0.00674876  -0.00464591
 Only used continuum xtalk (last column)
 Continuum xtalk parameters for Cam1 (not restored)=      0.00000      0.00000
       0.00000      0.00000      0.00000
@@ -57,19 +57,19 @@ Continuum xtalk parameters for Cam1 (not restored)=      0.00000      0.00000
    0.00768942  0.000717537   0.00764853   0.00750297   0.00288567
 Continuum xtalk parameters for Cam2 (not restored)=      0.00000      0.00000
       0.00000      0.00000      0.00000
-   -0.0435039   -0.0617672   -0.0472481   -0.0459516   -0.0536403
+   -0.0435039   -0.0617672   -0.0472481   -0.0459516   -0.0536402
     0.0285994    0.0166639    0.0234186    0.0241881    0.0196801
   -0.00666320  -0.00126887  -0.00673881  -0.00674736  -0.00464697
 Camera 1/Camera 2 ratios=      1.16605      1.16206      1.21282      1.20945
       1.18653
 Camera 1/Camera 2 ratios (not restored)=      1.16606      1.16206      1.21282
       1.20946      1.18654
-Shift between Camera 2 and 1 is=      5.41723      5.36286      5.46670
-      5.45837      5.59806
-     -7.99274     -8.11837     -8.03836     -8.02069     -7.88722
-Shift between Camera 2 and 1 is (not restored)=      4.96721      5.00440
-      5.38166      5.34605      4.00694
-     -6.16250     -7.25730     -7.03633     -6.71891    -0.251941
+Shift between Camera 2 and 1 is=      5.41610      5.36286      5.46636
+      5.45837      5.59786
+     -7.99289     -8.11837     -8.03836     -8.02069     -7.88722
+Shift between Camera 2 and 1 is (not restored)=      4.96721      5.00528
+      5.38088      5.34424      4.01351
+     -6.16125     -7.25730     -7.03633     -6.71934    -0.252071
     Lambda ---  Polarization --- Cam1/Cam2  weight
        0              1            0.411224
        0              2            0.558163
@@ -102,51 +102,51 @@ Shift between Camera 2 and 1 is (not restored)=      4.96721      5.00440
        4              1            0.350000
        4              2            0.564286
        4              3            0.515306
-Residual non-zero trends=       0       1    0.0014501049
-Residual non-zero trends=       0       2   0.00045232848
-Residual non-zero trends=       0       3    0.0011224561
-Residual non-zero trends=       1       1   0.00079467172
-Residual non-zero trends=       1       2   0.00076140855
-Residual non-zero trends=       1       3   0.00062228077
-Residual non-zero trends=       2       1   0.00045638342
-Residual non-zero trends=       2       2   0.00044713652
-Residual non-zero trends=       2       3    0.0013969927
-Residual non-zero trends=       3       1    0.0011001011
-Residual non-zero trends=       3       2   0.00037707475
-Residual non-zero trends=       3       3    0.0014025619
-Residual non-zero trends=       4       1   0.00037549279
-Residual non-zero trends=       4       2   0.00028185039
-Residual non-zero trends=       4       3   0.00029966687
-Residual non-zero trends (not restored)=       0       1    0.0027432164
-Residual non-zero trends (not restored)=       0       2   0.00039269184
-Residual non-zero trends (not restored)=       0       3    0.0012476114
-Residual non-zero trends (not restored)=       1       1   0.00086293085
-Residual non-zero trends (not restored)=       1       2   0.00059757396
-Residual non-zero trends (not restored)=       1       3   0.00065591657
-Residual non-zero trends (not restored)=       2       1   0.00085819515
-Residual non-zero trends (not restored)=       2       2   0.00046959930
-Residual non-zero trends (not restored)=       2       3    0.0012725615
-Residual non-zero trends (not restored)=       3       1    0.0023969497
-Residual non-zero trends (not restored)=       3       2   0.00040417485
-Residual non-zero trends (not restored)=       3       3    0.0014846545
-Residual non-zero trends (not restored)=       4       1   0.00039469713
-Residual non-zero trends (not restored)=       4       2   0.00027999780
-Residual non-zero trends (not restored)=       4       3   0.00029757744
-Substracted continuum polarization=       2       1     0.567323
-Substracted continuum polarization=       3       1     0.714941
-Substracted continuum polarization=       2       2     0.208349
-Substracted continuum polarization=       3       2     0.336045
-Substracted continuum polarization=       2       3     0.275871
-Substracted continuum polarization=       3       3     0.637624
-Substracted continuum polarization (not restored)=       2       1     0.477556
-Substracted continuum polarization (not restored)=       3       1     0.529832
-Substracted continuum polarization (not restored)=       2       2     0.236052
-Substracted continuum polarization (not restored)=       3       2     0.390244
-Substracted continuum polarization (not restored)=       2       3     0.286185
-Substracted continuum polarization (not restored)=       3       3     0.428619
-ad-hoc xtalk from V to Q is (not restored)=   -0.0928076    -0.120026
-    0.0845856     0.151606     0.118096
-ad-hoc xtalk from V to U is (not restored)=   -0.0922826    -0.117243
-    0.0207830    0.0140681    0.0174256
-ad-hoc xtalk from V to Q used is (to both)=   0.00583952
-ad-hoc xtalk from V to U used is (to both)=   -0.0436687
+Residual non-zero trends=       0       1    0.0014501121
+Residual non-zero trends=       0       2   0.00045232766
+Residual non-zero trends=       0       3    0.0011224587
+Residual non-zero trends=       1       1   0.00079466808
+Residual non-zero trends=       1       2   0.00076140695
+Residual non-zero trends=       1       3   0.00062228418
+Residual non-zero trends=       2       1   0.00045638307
+Residual non-zero trends=       2       2   0.00044713978
+Residual non-zero trends=       2       3    0.0013969961
+Residual non-zero trends=       3       1    0.0011001082
+Residual non-zero trends=       3       2   0.00037707559
+Residual non-zero trends=       3       3    0.0014025646
+Residual non-zero trends=       4       1   0.00037549286
+Residual non-zero trends=       4       2   0.00028185084
+Residual non-zero trends=       4       3   0.00029966673
+Residual non-zero trends (not restored)=       0       1    0.0027432043
+Residual non-zero trends (not restored)=       0       2   0.00039269226
+Residual non-zero trends (not restored)=       0       3    0.0012476113
+Residual non-zero trends (not restored)=       1       1   0.00086293778
+Residual non-zero trends (not restored)=       1       2   0.00059757219
+Residual non-zero trends (not restored)=       1       3   0.00065591669
+Residual non-zero trends (not restored)=       2       1   0.00085818458
+Residual non-zero trends (not restored)=       2       2   0.00046960164
+Residual non-zero trends (not restored)=       2       3    0.0012725611
+Residual non-zero trends (not restored)=       3       1    0.0023969381
+Residual non-zero trends (not restored)=       3       2   0.00040417364
+Residual non-zero trends (not restored)=       3       3    0.0014846549
+Residual non-zero trends (not restored)=       4       1   0.00039469918
+Residual non-zero trends (not restored)=       4       2   0.00027999445
+Residual non-zero trends (not restored)=       4       3   0.00029757847
+Substracted continuum polarization=       2       1     0.567319
+Substracted continuum polarization=       3       1     0.714945
+Substracted continuum polarization=       2       2     0.208378
+Substracted continuum polarization=       3       2     0.336163
+Substracted continuum polarization=       2       3     0.276434
+Substracted continuum polarization=       3       3     0.637784
+Substracted continuum polarization (not restored)=       2       1     0.477588
+Substracted continuum polarization (not restored)=       3       1     0.529815
+Substracted continuum polarization (not restored)=       2       2     0.236086
+Substracted continuum polarization (not restored)=       3       2     0.390303
+Substracted continuum polarization (not restored)=       2       3     0.286103
+Substracted continuum polarization (not restored)=       3       3     0.428467
+ad-hoc xtalk from V to Q is (not restored)=   -0.0928215    -0.120025
+    0.0845855     0.151618     0.118102
+ad-hoc xtalk from V to U is (not restored)=   -0.0922723    -0.117243
+    0.0207893    0.0140683    0.0174288
+ad-hoc xtalk from V to Q used is (to both)=   0.00583920
+ad-hoc xtalk from V to U used is (to both)=   -0.0436645

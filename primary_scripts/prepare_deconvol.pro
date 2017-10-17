@@ -45,7 +45,7 @@ if (obsen ne 0 and cyclen ne 0) then begin ; image readout
 ;pathr = 'sets_index/'   ;path to sets and inds 
 ;pathd = 'darks/'        ;path to darks
 ;pathf = 'flats_stage4/' ;path to rem_lin flats
-pathf = 'at3/'
+pathf = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/at3/'
 ;pathf = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/stage4_flat/'
 pathr = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/sets_inds/'
 ;restore, pathd + 'dar_12thJune91hr.sav', /v
@@ -53,7 +53,7 @@ pathr = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/sets_inds/'
 restore, pathr + 'set_12thJune16hr.sav', /v           ;restore housekeepings of data not dark or flats?
 ;restore, pathf + 'pref_factors_stage4_flat_out.sav', /v ;restore prefilter factors
 
-restore,'dar_12thJune_tr.sav',/v
+restore,'/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/dar_12thJune_tr.sav',/v
 restore, pathf+'stage4_flat_out_at3.sav'
 restore, pathf + 'pref_factors_stage4_flat_out_at3.sav'
 
