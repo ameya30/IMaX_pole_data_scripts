@@ -14,7 +14,7 @@ files = natsorted(glob.glob('/home/prabhu/sunrise_holly/movie_data/*.sav'))
 data = [readsav(i,python_dict = True)['iid'] for i in files]
 
 lam = 4
-pol = 3
+pol = 0
 
 print (data[7][pol,lam,:,:].max())
 print (data[7][pol,lam,:,:].min())
@@ -22,7 +22,7 @@ print (data[7][pol,lam,:,:].min())
 
 fig = plt.figure(figsize=(12,12))
 ax = plt.axes()
-im = ax.imshow(data[0][pol,lam,:,:],cmap='gray',vmax=480,vmin=-200)
+im = ax.imshow(data[0][pol,lam,:,:],cmap='gray',vmax=8250,vmin=75)
 fig.colorbar(im)
 fig.tight_layout(pad=1.8)
 plt.gca().invert_yaxis()
