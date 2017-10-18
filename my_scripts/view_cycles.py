@@ -9,7 +9,16 @@ import numpy as np
 from scipy.io import readsav
 from natsort import natsorted
 
-files = natsorted(glob.glob('/home/prabhu/sunrise_holly/movie_data/*.sav'))
+#for workstation
+#files = natsorted(glob.glob('/home/prabhu/sunrise_holly/movie_data/*.sav'))
+
+#for pulpo
+#mine
+files = natsorted(glob.glob('/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/saves_Oct11/mk_magneto_tr2*'))
+#holly
+#files = natsorted(glob.glob('/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/mk_magneto_outputreduc_rnr_/*.sav'))
+
+files = list(filter(lambda x: x[-3:-1]=='sa',files))
 
 data = [readsav(i,python_dict = True)['iid'] for i in files]
 
@@ -22,7 +31,11 @@ print (data[7][pol,lam,:,:].min())
 
 fig = plt.figure(figsize=(12,12))
 ax = plt.axes()
+<<<<<<< HEAD
 im = ax.imshow(data[0][pol,lam,:,:],cmap='gray',vmax=8250,vmin=75)
+=======
+im = ax.imshow(data[0][pol,lam,:,:],cmap='gray',vmax=8300,vmin=100)
+>>>>>>> 80d114b750c0844c3e26ea77c4e8709ded830279
 fig.colorbar(im)
 fig.tight_layout(pad=1.8)
 plt.gca().invert_yaxis()
