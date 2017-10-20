@@ -14,9 +14,9 @@ from natsort import natsorted
 
 #for pulpo
 #mine
-files = natsorted(glob.glob('/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/saves_Oct11/mk_magneto_tr2*'))
+#files = natsorted(glob.glob('/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/saves_Oct11/mk_magneto_tr2*'))
 #holly
-#files = natsorted(glob.glob('/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/mk_magneto_outputreduc_rnr_/*.sav'))
+files = natsorted(glob.glob('/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/mk_magneto_outputreduc_rnr_/*.sav'))
 
 files = list(filter(lambda x: x[-3:-1]=='sa',files))
 

@@ -9,24 +9,26 @@
 ;*********************************************************************************
 
 pro rem_fringes_post_demod, stok = stok, wvln = wvln;, save_out = save_out;file_in
-files = file_search('saves_May31st/mk_mag*.sav')
+;files = file_search('/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/mk_magneto_outputreduc_rnr_/mk_mag*.sav')
+files = file_search('/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/saves_Oct11/mk_magneto_tr2*.sav')
 
 for i = 0, n_elements(files)-1 do begin	
         print, files[i]
+	
 	; Read file
 	restore, files[i]
 	full_cycle = iid
 	
 	split_name = strsplit(files[i], '_', /extract)
-	split_2    = strsplit(split_name[6], '.', /extract)
+	split_2    = strsplit(split_name[11], '.', /extract)
 
-        save_out = 'saves_May31st/post_demod_output_' + split_2[0]
+        save_out = '/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/saves_Oct11/post_demod_tr2_output_' + split_2[0]
 	
 	print, save_out
 	; Take single image
         if i EQ 0 then begin	
 		ima = full_cycle[*, *, wvln, stok]
-		
+	
 		xdim = (size(ima))[1]
 		ydim = (size(ima))[2]
 		
