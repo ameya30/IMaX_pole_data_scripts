@@ -4,7 +4,7 @@ import numpy               as np
 import matplotlib.pyplot   as plt
 
 from   pandas                import *
-from   pandas.tools.plotting import table
+from   pandas.plotting import table
 from   astropy.io            import fits
 from   scipy                 import optimize
 
@@ -28,7 +28,7 @@ def to_cir(c):
 
 # Get data
 
-res = fits.open('../Data/imax_find_sun_input.fits')
+res = fits.open('/home/prabhu/sunrise_holly/work_IMaX_pole_scripts/imax_find_sun/imax_find_sun_input.fits')
 
 res = res[0].data
 
@@ -38,8 +38,8 @@ plt.imshow(np.flipud(res[0, 4, 80:936-730, 80:936-70]))
 
 # Find limb, plot contours
 
-limb = plt.contour(np.flipud(res[0, 4, 80:936-730, 80:936-80]), 3, linewidths = 0.2)
-
+limb = plt.contour(np.flipud(res[0, 4, 80:936-730, 80:936-80]), 3, linewidths = 5)
+plt.show()
 path = limb.collections[0].get_paths()[0]
 
 points = path.vertices
@@ -47,11 +47,13 @@ points = path.vertices
 x_ind = points[:, 0]
 y_ind = points[:, 1]
 
+print (x_ind)
+print (y_ind)
 # Find circle
 
 pixScale = 50. / 936
 
-radSunAproxPix = 960 / pixScale
+radSunAproxPix = 948 / pixScale
 
 cenEst = (x_ind[0] - radSunAproxPix, y_ind[0] - radSunAproxPix)
 
@@ -102,7 +104,7 @@ axes.yaxis.set_visible(False)
 axes.set_frame_on(False)
 
 table(axes, bestEstTable, loc = 'upper right')
-
+plt.show()
 # Save fig
 
-plt.savefig('../Figures/imax_find_sun.png', bbox_inches = 'tight', dpi = 500)
+# plt.savefig('../Figures/imax_find_sun.png', bbox_inches = 'tight', dpi = 500)
