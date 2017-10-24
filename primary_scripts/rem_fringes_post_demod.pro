@@ -55,7 +55,7 @@ for i = 0, n_elements(files)-1 do begin
 		masking_power, pow_ima, pow_corr, mask, weight
 	endif
 	; Remove fringes from the image
-	
+	stop
 	print, 'RUNNING PROGRAM filtering_fringes.pro'
 	
 	for wvln = 0, 4 do begin
