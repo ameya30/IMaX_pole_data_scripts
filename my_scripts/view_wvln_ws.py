@@ -36,12 +36,6 @@ fig.tight_layout(pad=1.8)
 plt.gca().invert_yaxis()
 
 
-# fig2 = plt.figure(figsize=(12,12))
-# ax2 = plt.axes()
-# im2 = ax2.imshow(fima[0][st,2,:,:],cmap='gray',vmax=cmax,vmin=cmin)
-# fig2.colorbar(im)
-# fig2.tight_layout(pad=1.8)
-# plt.gca().invert_yaxis()
 
 
 def animate(i):

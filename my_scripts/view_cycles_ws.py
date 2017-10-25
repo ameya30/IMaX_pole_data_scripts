@@ -12,7 +12,7 @@ from natsort import natsorted
 
 ########for workstation##########
 
-files = natsorted(glob.glob('/home/prabhu/sunrise_holly/movie_data/*.sav')) #to read in my restored .sav files from mk_magneto_restor
+files = natsorted(glob.glob('/home/prabhu/sunrise_holly/movie_data/mk_magneto_tr2*')) #to read in my restored .sav files from mk_magneto_restor
 files = list(filter(lambda x: x[-3:-1]=='sa',files))
 data = [readsav(i,python_dict = True)['iid'] for i in files]
 
