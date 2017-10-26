@@ -7,45 +7,45 @@ from itertools import chain
 import glob
 
 files = natsorted(glob.glob("/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/saves_Oct11/*.fits"))
-print (files)
-# cy = int(input("Choose cycle: ") )
 
-# st = int(input("Choose stokes: "))
+cy = int(input("Choose cycle: ") )
 
-# stokes = {0:'I',1:'Q',2:'U',3:'V'}
+st = int(input("Choose stokes: "))
 
-# #opening only the cycle we choose above as an array and putting it into a list fima
-# fima = [fits.open(i)[0].data for i in files if '_'+str(cy)+'.' in i]
+stokes = {0:'I',1:'Q',2:'U',3:'V'}
 
-# #taking mean of the maximum intensities for various spectral positions for a particular stokes
+#opening only the cycle we choose above as an array and putting it into a list fima
+fima = [fits.open(i)[0].data for i in files if '_'+str(cy)+'.' in i]
 
-# cmax = np.mean([np.max(fima[0][st,i,:,:]) for i in range(fima[0].shape[1])])
-# cmin = np.mean([np.min(fima[0][st,i,:,:]) for i in range(fima[0].shape[1])])
+#taking mean of the maximum intensities for various spectral positions for a particular stokes
 
-# frames_1 = [list(range(fima[0].shape[1]))]*20
-# frames = list(chain.from_iterable(frames_1))
+cmax = np.mean([np.max(fima[0][st,i,:,:]) for i in range(fima[0].shape[1])])
+cmin = np.mean([np.min(fima[0][st,i,:,:]) for i in range(fima[0].shape[1])])
 
-# # Writer = animation.writers['ffmpeg']
-# # writer = Writer(fps=1, metadata=dict(artist='Me'), bitrate=1800)
+frames_1 = [list(range(fima[0].shape[1]))]*20
+frames = list(chain.from_iterable(frames_1))
 
-# fig = plt.figure(figsize=(12,12))
-# ax = plt.axes()
-# im = ax.imshow(fima[0][st,0,:,:],cmap='gray',vmax=cmax,vmin=cmin)
-# fig.colorbar(im)
-# fig.tight_layout(pad=1.8)
-# plt.gca().invert_yaxis()
+#Writer = animation.writers['ffmpeg']
+#writer = Writer(fps=1, metadata=dict(artist='Me'), bitrate=1800)
 
-
-
-# def animate(i):
-# 	im.set_data(fima[0][st,i,:,:])#,cmap='gray',vmax=340,vmin=-140)
-# 	ax.set_title("cycle number = "+str(cy)+', lambda = ' + str(i) +', stokes = ' +stokes[st])
-# 	return im,
-
-# ani = animation.FuncAnimation(fig,animate,frames,interval = 1000,blit=False)
-
-# # ani.save('cycle_{}_stokes_{}.mp4'.format(str(cy),stokes[st]), writer = writer,dpi=200)
+fig = plt.figure(figsize=(12,12))
+ax = plt.axes()
+im = ax.imshow(fima[0][st,0,:,:],cmap='gray',vmax=cmax,vmin=cmin)
+fig.colorbar(im)
+fig.tight_layout(pad=1.8)
+plt.gca().invert_yaxis()
 
 
 
-# plt.show()
+def animate(i):
+	im.set_data(fima[0][st,i,:,:])#,cmap='gray',vmax=cmax,vmin=cmin)
+	ax.set_title("cycle number = "+str(cy)+', lambda = ' + str(i) +', stokes = ' +stokes[st])
+	return im
+
+ani = animation.FuncAnimation(fig,animate,frames,interval = 1000,blit=False)
+
+# ani.save('cycle_{}_stokes_{}.mp4'.format(str(cy),stokes[st]), writer = writer,dpi=200)
+
+
+
+plt.show()
