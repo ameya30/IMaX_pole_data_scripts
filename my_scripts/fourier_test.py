@@ -5,7 +5,7 @@ from scipy import signal
 from matplotlib import pyplot as plt
 import matplotlib as mpl
 def four(x,win):
-	power = np.abs(fftshift(fft2(x*win)))
+	power = np.abs(fftshift(fft2(x*win)))**2
 	return power
 
 datae = fits.open("/home/prabhu/sunrise_holly/test_wt_diff_flats/mera_26.fits")
