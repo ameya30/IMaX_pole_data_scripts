@@ -44,11 +44,11 @@ po = np.abs(four)**2
 four2 = fftshift(fft2(hann2*stokv))
 po2 = np.abs(four2)**2
 
-fig = plt.figure(figsize=(12,12))
-ax = plt.axes()
-img = plt.imshow(po,cmap='gray',norm=mpl.colors.LogNorm())
-plt.gca().invert_yaxis()
-plt.colorbar(img)
+#fig = plt.figure(figsize=(12,12))
+#ax = plt.axes()
+#img = plt.imshow(po,cmap='gray',norm=mpl.colors.LogNorm())
+#plt.gca().invert_yaxis()
+#plt.colorbar(img)
 
 # figd = plt.figure(figsize=(12,12))
 # axd = plt.axes()
@@ -75,8 +75,8 @@ distances2 = np.around(distances)
 
 new_po = [np.sum(po[distances2==i]) for i in np.arange(np.min(distances2),np.max(distances2)+1)]
 new_po2 = [np.sum(po2[distances2==i]) for i in np.arange(np.min(distances2),np.max(distances2)+1)]
-fig2 = plt.figure()
-ax2 = plt.axes()
+#fig2 = plt.figure()
+#ax2 = plt.axes()
 # img2 =plt.loglog(np.arange(np.min(distances2),np.max(distances2)+1),new_po,'r')
 # img3 = plt.loglog(np.arange(np.min(distances2),np.max(distances2)+1),new_po2,'b')
 
@@ -87,9 +87,9 @@ print(len(kx[468::]))
 print(len(new_po[0:468]))
 ones = np.ones((936,936))
 
-ones[distances2==50] *=10^7
-img3 = plt.loglog(kx[468::],new_po[0:468],'r')
-img4 = plt.loglog(kx[468::],new_po2[0:468],'b')
+#ones[distances2==50] *=10^7
+#img3 = plt.loglog(kx[468::],new_po[0:468],'r')
+#img4 = plt.loglog(kx[468::],new_po2[0:468],'b')
 
 # plt.imshow(ones,cmap='gray')
 plt.show()
