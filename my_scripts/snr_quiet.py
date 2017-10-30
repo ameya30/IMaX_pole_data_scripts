@@ -1,11 +1,11 @@
 import numpy as np
 from astropy.io import fits
 from matplotlib import pyplot as plt
+import matplotlib as mpl
 
 
 
-
-fima = fits.open('/home/prabhu/sunrise_holly/movie_data/post_demod_tr2_output_21.fits')[0].data 
+fima = fits.open('/home/prabhu/sunrise_holly/movie_data/post_demod_tr2_output_22.fits')[0].data 
 
 
 st = int(input("Choose stokes: "))
@@ -40,13 +40,22 @@ fig.colorbar(im)
 fig.tight_layout(pad=1.8)
 plt.gca().invert_yaxis()
 
-plt.show()
+# plt.show()
 
 y1 = 200
 y2 = 280
-x1 = 340
+x1 = 350
 x2 = 500
 
+fig2 = plt.figure()
+ax2 = plt.axes()
+im2 = ax2.imshow(maif[st,4,y1:y2,x1:x2],cmap='gray')
+fig2.colorbar(im2)
+fig2.tight_layout(pad=1.8)
+plt.gca().invert_yaxis()
+plt.show()
+
+print(maif[st,4,y1:y2,x1:x2].shape)
 
 std = np.std(maif[st,4,y1:y2,x1:x2])
 meanie = np.mean(maif[st,4,y1:y2,x1:x2])
