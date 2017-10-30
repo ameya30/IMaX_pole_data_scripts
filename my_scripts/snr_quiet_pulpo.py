@@ -40,12 +40,14 @@ fig.colorbar(im)
 fig.tight_layout(pad=1.8)
 plt.gca().invert_yaxis()
 
+
 plt.show()
 
 y1 = 200
 y2 = 280
 x1 = 340
 x2 = 500
+
 
 
 std = np.std(maif[st,4,y1:y2,x1:x2])

@@ -14,11 +14,17 @@ data = dum[0].data
 
 i_cont = data[0,4,:,:]
 stokv = data[3,2,:,:]
+stokq =data[1,2,:,:]
 
 figaa = plt.figure(figsize=(12,12))
+figaa.suptitle('Stokes Q, lambda2')
 axaa = plt.axes()
-plt.imshow(i_cont,cmap='gray')
+imaaa= plt.imshow(i_cont,cmap='gray')#,vmin=100,vmax=8350)
+# imaaa=plt.imshow(stokq[715:785,419:590],cmap='gray',vmin=-62.5,vmax=127)
 plt.gca().invert_yaxis()
+# plt.colorbar(imaaa)
+# plt.savefig('l_stokesQ_lambda2.png',dpi=500)
+plt.show()
 dim_i = i_cont.shape
 h = signal.hann(i_cont.shape[0])
 
@@ -49,7 +55,7 @@ ax = plt.axes()
 img = plt.imshow(po,cmap='gray',norm=mpl.colors.LogNorm())
 plt.gca().invert_yaxis()
 plt.colorbar(img)
-
+# plt.savefig('powerSpec.png',dpi=500)
 # figd = plt.figure(figsize=(12,12))
 # axd = plt.axes()
 # imgd = plt.imshow(dekh,cmap='gray',norm=mpl.colors.LogNorm())
@@ -90,6 +96,7 @@ ones = np.ones((936,936))
 ones[distances2==50] *=10^7
 img3 = plt.loglog(kx[468::],new_po[0:468],'r')
 img4 = plt.loglog(kx[468::],new_po2[0:468],'b')
-
+plt.xlabel('1/arcsec')
+# plt.savefig('radial_profile_powerSpec.png',dpi=500)
 # plt.imshow(ones,cmap='gray')
 plt.show()
