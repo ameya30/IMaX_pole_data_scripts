@@ -8,7 +8,7 @@ import itertools
 
 from power import PSD2,pspec
 
-dum = fits.open("/scratch/prabhu/HollyWaller/IMaX_pole_data_scripts/primary_scripts/saves_Oct11/post_demod_tr2_output_22.fits")
+dum = fits.open("/home/prabhu/sunrise_holly/movie_data/post_demod_tr2_output_22.fits")
 
 data = dum[0].data
 
