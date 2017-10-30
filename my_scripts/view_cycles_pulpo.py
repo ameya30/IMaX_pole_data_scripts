@@ -25,7 +25,6 @@ from natsort import natsorted
 #data = [readsav(i,python_dict = True)['iid'] for i in files]
 
 
-
 ##### to read in .fits from holly's post demod fringe removal#####
 
 ##mine

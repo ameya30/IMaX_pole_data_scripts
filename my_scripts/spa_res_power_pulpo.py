@@ -100,6 +100,7 @@ distances2 = np.around(distances)
 new_po = [np.sum(po[distances2==i]) for i in np.arange(np.min(distances2),np.max(distances2)+1)]
 new_po2 = [np.sum(po2[distances2==i]) for i in np.arange(np.min(distances2),np.max(distances2)+1)]
 
+
 #plotting the radial power spectra
 fig2 = plt.figure()
 ax2 = plt.axes()
