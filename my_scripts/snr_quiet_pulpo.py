@@ -18,7 +18,7 @@ print(dim)
 maif = np.zeros(shape=(dim[0],dim[1],dim[2],dim[3]))
 print(maif.shape)
 if st==0:
-	maif[st,:,:,:] = fima[st,:,:,:]/np.mean(fima[0,4,:,:])
+	maif[st,:,:,:] = fima[st,:,:,:]/np.mean(fima[0,4,230:880,83:859])  
 	up,down=1.5,0.5
 elif st==1:
 	maif[st,:,:,:] = fima[st,:,:,:]/fima[0,4,:,:]

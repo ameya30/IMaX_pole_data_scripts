@@ -24,7 +24,7 @@ fima = [fits.open(i)[0].data for i in files if '_'+str(cy)+'.' in i]
 dim = fima[0].shape
 maif = np.zeros(shape=(dim[0],dim[1],dim[2],dim[3]))
 if st==0:
-	maif[st,:,:,:] = fima[0][st,:,:,:]/np.mean(fima[0][0,4,:,:])
+	maif[st,:,:,:] = fima[0][st,:,:,:]/np.mean(fima[0][0,4,230:880,83:859])
 	up,down=1.5,0.
 elif st==1:
 	maif[st,:,:,:] = fima[0][st,:,:,:]/fima[0][0,4,:,:]
