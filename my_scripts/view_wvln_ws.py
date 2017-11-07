@@ -7,7 +7,7 @@ from itertools import chain
 import glob
 from scipy.io import readsav
 
-# files = natsorted(glob.glob("/home/prabhu/sunrise_holly/movie_data/*.fits"))
+files = natsorted(glob.glob("/home/prabhu/sunrise_holly/movie_data/*.fits"))
 
 cy = int(input("Choose cycle: ") )
 
@@ -16,8 +16,8 @@ st = int(input("Choose stokes: "))
 stokes = {0:'I',1:'Q',2:'U',3:'V'}
 
 #opening only the cycle we choose above as an array and putting it into a list fima
-# fima = [fits.open(i)[0].data for i in files if '_'+str(cy)+'.' in i]
-fima = [readsav('/home/prabhu/sunrise_holly/IMaX_pole_data_scripts/mk_magneto_outputreduc_rnr_/mk_magneto_outputreduc_rnr_300_21.sav',python_dict=True)['iid']]
+fima = [fits.open(i)[0].data for i in files if '_'+str(cy)+'.' in i]
+
 
 #taking mean of the maximum intensities for various spectral positions for a particular stokes
 # cmax = np.mean([np.max((fima[0][st,i,:,:]/fima[0][0,4,:,:])) for i in range(fima[0].shape[1])])
@@ -63,7 +63,7 @@ def animate(i):
 
 ani = animation.FuncAnimation(fig,animate,frames,interval = 1000,blit=False)
 
-ani.save('cycle_{}_stokes_{}_holly.mp4'.format(str(cy),stokes[st]), writer = writer)
+ani.save('cycle_{}_stokes_{}.mp4'.format(str(cy),stokes[st]), writer = writer)
 
 
 
