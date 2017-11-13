@@ -203,9 +203,9 @@ for ind=0,n_lambda-1 do begin
         for jnd=0,n_pol-1 do begin
           print,'Doing restoration for lambda and pol...............',ind,jnd
           im01=iim1(*,*,ind,jnd)
-
+          
 		      imr1=deconvolution_IMaX7(im01,ctel,inter,option_fringes,imnr1,maskf=mask1,maskg=maskgd1) ; global psf
-     		
+     		  
 		      iim1n(*,*,ind,jnd)=imnr1 ; not restored
           iim1(*,*,ind,jnd)=imr1   ; restored
 

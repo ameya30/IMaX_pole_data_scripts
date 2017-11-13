@@ -33,8 +33,8 @@ fwhm = 7  ;0 ;17;0 ;1   ;7;17  ;smoothing param to smooth the input power
     ;pows(xl:xh,yl:yh)=pow(xl:xh,yl:yh) ;Linea alternativa a las 4 siguientes.
     masc=mask*0+1                       ;Preserva sin smoothing la potencia de
     masc(xl:xh,yl:yh)=mask(xl:xh,yl:yh) ;las franjas de baja freq. localizadas
-    mascc=masc eq 0                     ;en areas muy pequeñas. Asi se evita
-    pows=pows*masc+pow*mascc            ;que la señal se debilite en el smoothing.
+    mascc=masc eq 0                     ;en areas muy pequeï¿½as. Asi se evita
+    pows=pows*masc+pow*mascc            ;que la seï¿½al se debilite en el smoothing.
     pows=(pows+especul(pows))/2.
   endif else begin
     pows=pow
@@ -175,7 +175,7 @@ function deconvolution_IMaX7,im0,c_medt,inter,flag,imfd,maskf=maskf,maskg=maskg
 ;Lee las mascaras de Mikey-mouse para deformaciones de soportes de M1 en SUNRISE
 ;restore,'/scratch/TALLERK/MICKEY_MASK/mickeymask952.save' ;carga mik_r45 y phi_m1 !!!!!
 mik=0 ;mik_r45        ; =0 si no quiero topos !!!!!
-spid=11  ;1(patch 128) ; 3(patch 256) ; ~ 11 (patch de 952 ó 936 pix)!!!!! 
+spid=11  ;1(patch 128) ; 3(patch 256) ; ~ 11 (patch de 952 ï¿½ 936 pix)!!!!! 
 ;__________________________________________________________________________
 
 ; Parameters and functions derived from the previous information
@@ -251,7 +251,7 @@ spid=11  ;1(patch 128) ; 3(patch 256) ; ~ 11 (patch de 952 ó 936 pix)!!!!!
   d0=fft((ima0-sus0)*www,-1) & d0(0,0)=complex(0.,0.)
   d0=shift(d0,siz/2,siz/2)
   power=(abs(d0))^2
-
+  d1 = d0
 ; Filtrado de franjas optativo
 
   if keyword_set(maskf) then begin
@@ -263,7 +263,7 @@ spid=11  ;1(patch 128) ; 3(patch 256) ; ~ 11 (patch de 952 ó 936 pix)!!!!!
   endif
 
   ima = float(fft(shift(d0,-siz/2,-siz/2),1))  ;image filtered from fringes
-
+  
 ; Computation of the noise power level. Smoothing of the power spectrum
 
   pows=sconvol(power,fwhm=fwhm)
@@ -383,11 +383,11 @@ start:
   if flag eq 2 then begin
     filt_rest=t0*0.
     wfil=where(tsupport ne 0,nfil)
-    ;Regularizacion con constante aditiva en la mtf²
+    ;Regularizacion con constante aditiva en la mtfï¿½
     ;filt_rest(wfil)=filter(wfil)*conj(t0(wfil))/(mtf0(wfil)^2+regdelta)
-    ;Regularizacion con cuña aditiva en la mtf²
+    ;Regularizacion con cuï¿½a aditiva en la mtfï¿½
     nu_rel=(shift(dist(siz),siz/2,siz/2))/pix_cut ;normaliza distancias a la de corte.
-    suma = nu_rel*regdelta*tsupport  ;genera una cuña creciente hasta la cutoff
+    suma = nu_rel*regdelta*tsupport  ;genera una cuï¿½a creciente hasta la cutoff
     filt_rest(wfil)=filter(wfil)*conj(t0(wfil))/(mtf0(wfil)^2+suma(wfil))
     ;filt_rest(wfil)=filter(wfil)*conj(t0(wfil))/(mtf0(wfil)+suma(wfil))^2 ;(filtra demasiado)
   endif

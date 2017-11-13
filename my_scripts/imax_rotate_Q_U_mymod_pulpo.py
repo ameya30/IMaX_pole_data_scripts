@@ -14,7 +14,7 @@ def Q_eq(phi):
 
         uSing = uMes[wv]
         qSing = qMes[wv]
-     
+     	
         uNew = -1 * qSing * np.sin(phi) + uSing * np.cos(phi)
         sumU += np.square(uNew)
 
@@ -24,16 +24,14 @@ plot_figs = 0
 
 # Load in array
 
-input_list = natsorted(glob.glob('/home/prabhu/sunrise_holly/binned_cycles/*.fits'))
-
-
+input_list = natsorted(glob.glob('/scratch/prabhu/backup_workstation/sunrise_holly/binned_cycles/*.fits'))
 
 for i in range (0, len(input_list)):
     fullArr = fits.open(input_list[i])
-    fullArr = fullArr[0].data
+    fullArr = fullArr[1].data #0 for restore 1 for non restored
    
-    save_name = '/home/prabhu/sunrise_holly/binned_cycles/imax_lp_max_' + input_list[i].split('_')[-1].split('.')[0]
-    save_angs = '/home/prabhu/sunrise_holly/binned_cycles/imax_roat_angle_Q_U_' + input_list[i].split('_')[-1].split('.')[0]s 
+    save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/binned_cycles/imax_lp_max_nr_' + input_list[i].split('_')[-1].split('.')[0]
+    save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/binned_cycles/imax_roat_angle_Q_U_nr_' + input_list[i].split('_')[-1].split('.')[0] 
 
     print (save_name)
     print (save_angs)
@@ -45,12 +43,12 @@ for i in range (0, len(input_list)):
     qNew   = np.empty(shape = (fullDim[1], fullDim[2], fullDim[3]))
     
     for x in range (0, fullDim[3]):
+        print (x)
         for y in range (0, fullDim[2]):
-    
+    	    
             qMes = fullArr[1, :, y, x] 
             uMes = fullArr[2, :, y, x] 
-    
-            res = minimize_scalar(Q_eq, bounds=(0, np.pi), method='bounded')
+            res = minimize_scalar(Q_eq, bounds=(0, 2*np.pi), method='bounded')
             angle = res['x']
             angArr[y, x] = angle
             
@@ -60,9 +58,10 @@ for i in range (0, len(input_list)):
 
     hdu_ang = fits.PrimaryHDU(angArr)
     hdu_max = fits.PrimaryHDU(qNew)
-
+    hdu_u = fits.ImageHDU(uNew,name='u')
+    hdulist = fits.HDUList([hdu_max,hdu_u])
     hdu_ang.writeto(save_angs)
-    hdu_max.writeto(save_name)
+    hdulist.writeto(save_name)
 
 
 if plot_figs == 1:
