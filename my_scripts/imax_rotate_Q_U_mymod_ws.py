@@ -24,15 +24,15 @@ plot_figs = 0
 
 # Load in array
 
-input_list = natsorted(glob.glob('/scratch/prabhu/backup_workstation/sunrise_holly/binned_cycles/*.fits'))
-
+input_list = natsorted(glob.glob('/home/prabhu/sunrise_holly/binned_cycles/*.fits'))
+print (input_list)
 
 for i in range (0, len(input_list)):
     fullArr = fits.open(input_list[i])
-    fullArr = fullArr[0].data #0 for restored data 1 for non restored #############
+    fullArr = fullArr[0].data #0 for restore 1 for non restored
    
-    save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_' + input_list[i].split('_')[-1].split('.')[0]
-    save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_' + input_list[i].split('_')[-1].split('.')[0] 
+    save_name = '/home/prabhu/sunrise_holly/imax_lp_max_/imax_lp_max_' + input_list[i].split('_')[-1].split('.')[0]
+    save_angs = '/home/prabhu/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_' + input_list[i].split('_')[-1].split('.')[0] 
 
     print (save_name)
     print (save_angs)
@@ -56,7 +56,7 @@ for i in range (0, len(input_list)):
             for wv in range (0, 5):
                 uNew[wv, y, x] = -1 * fullArr[1, wv, y, x] * np.sin(angle) + fullArr[2, wv, y, x] * np.cos(angle) 
                 qNew[wv, y, x] =      fullArr[1, wv, y, x] * np.cos(angle) + fullArr[2, wv, y, x] * np.sin(angle)
-    #saving the new q and u in the same file as primary[0] and image[1] hdu's
+
     hdu_ang = fits.PrimaryHDU(angArr)
     hdu_max = fits.PrimaryHDU(qNew)
     hdu_u = fits.ImageHDU(uNew,name='u')
