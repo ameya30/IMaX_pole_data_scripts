@@ -31,8 +31,8 @@ for i in range (0, len(input_list)):
     fullArr = fits.open(input_list[i])
     fullArr = fullArr[0].data #0 for restored data 1 for non restored #############
    
-    save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_' + input_list[i].split('_')[-1].split('.')[0]
-    save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_' + input_list[i].split('_')[-1].split('.')[0] 
+    save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_' + ("_").join(input_list[i].split('_')[-2::])
+    save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_' + ("_").join(input_list[i].split('_')[-2::]) 
 
     print (save_name)
     print (save_angs)

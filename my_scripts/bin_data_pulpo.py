@@ -1,15 +1,28 @@
-from con_re_scipy import congrid
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov 16 18:26:39 2017
+
+@author: prabhu
+"""
+
+#from con_re_scipy import congrid
 from scipy.io import readsav
 from matplotlib import pyplot as plt
 import numpy as np
 from astropy.io import fits
 
-data = readsav("/home/prabhu/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_21.sav",python_dict=True)
+def rebin(a, shape):
+    sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
+    return a.reshape(sh).mean(-1).mean(1)
+
+
+data = readsav("/scratch/prabhu/backup_workstation/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_22.sav",python_dict=True)
 
 iid = data['iid'] #demodulated and restored 
 iidn = data['iidn'] #demodulated and not restored
 
-bi = 3
+bi = 2
 stok,wvln,dimy,dimx = iid.shape
 
 binr = np.zeros(shape = (stok,wvln,int(dimx/bi),int(dimy/bi)))
@@ -19,13 +32,13 @@ binnr = np.zeros(shape = (stok,wvln,int(dimx/bi),int(dimy/bi)))
 for i in range(stok):
 	for j in range(wvln):
 		ima = iid[i,j,:,:]
-		binr[i,j,:,:] = congrid(ima,(dimy/bi,dimx/bi))
+		binr[i,j,:,:] = rebin(ima,(int(dimy/bi),int(dimx/bi)))
 
 #binning bi x bi for non-restored data
 for i in range(stok):
 	for j in range(wvln):
 		iman = iidn[i,j,:,:]
-		binnr[i,j,:,:] = congrid(iman,(dimy/bi,dimx/bi))
+		binnr[i,j,:,:] = rebin(iman,(int(dimy/bi),int(dimx/bi)))
 
 
 
@@ -42,4 +55,11 @@ hdu2 = fits.ImageHDU(data=binnr,name="not restored")
 #making hdulist to write into a fits file
 hdulist = fits.HDUList([hdu1,hdu2])
 
-hdulist.writeto('/home/prabhu/sunrise_holly/binned_cycles/binned_tr2_mk_restor_300_21_' + str(bi) +'.fits')
+hdulist.writeto('/scratch/prabhu/backup_workstation/sunrise_holly/binned_cycles/binned_tr2_mk_restor_300_22_' + str(bi) +'.fits')
+
+
+
+
+
+
+
