@@ -17,6 +17,8 @@ print(dim)
 
 maif = np.zeros(shape=(dim[0],dim[1],dim[2],dim[3]))
 print(maif.shape)
+
+####################THIS SORT OF DIVISION WORKS. I HAVAE CHECKED, DONT PANIC#################
 if st==0:
 	maif[st,:,:,:] = fima[st,:,:,:]/np.mean(fima[0,4,:,:])
 	up,down=1.5,0.5
@@ -29,8 +31,6 @@ elif st==2:
 else:
 	maif[st,:,:,:] = fima[st,:,:,:]/fima[0,4,:,:]
 	up,down=0.08,-0.08
-
-
 
 
 fig = plt.figure(figsize=(12,12))

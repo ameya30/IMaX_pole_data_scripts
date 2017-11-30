@@ -11,7 +11,7 @@ from   matplotlib.ticker     import FuncFormatter
 
 # Get data
 
-files = glob.glob('../Data/normalised_output_*.fits')
+files = glob.glob('/home/prabhu/sunrise_holly/normalize_mu_output/*.fits')
 
 for el in files:
 
@@ -19,15 +19,17 @@ for el in files:
     res = res[0].data
     
     split_name = el.split('_')
-    save_out = '../Data/mean_rem_output_' + split_name[2]
-
-    print save_out    
+    if len(split_name)==6:
+        save_out = '/home/prabhu/sunrise_holly/mean_rem_output/mean_rem_output_' + split_name[-1]
+    else:
+        save_out = '/home/prabhu/sunrise_holly/mean_rem_output/mean_rem_output_nr_' + split_name[-1]
+    print (save_out)
 
     # Find ave intensity of each continuum and remove from images
     
     for stok in range(1, 4):
         mean = np.mean(res[stok, 4, 240:640, 100:700])
-        print mean
+        print (mean)
         for wvln in range (0, 5):
             res[stok, wvln, :, :] -= mean
     
