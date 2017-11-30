@@ -6,6 +6,7 @@ import matplotlib.gridspec as gridspec
 
 from scipy.optimize import minimize_scalar
 from astropy.io     import fits
+from scipy.io import readsav
 
 def Q_eq(phi):
     # Set inputs for fnction
@@ -24,16 +25,24 @@ plot_figs = 0
 
 # Load in array
 
-input_list = natsorted(glob.glob('/scratch/prabhu/backup_workstation/sunrise_holly/binned_cycles/*.fits'))
-
+#input_list = natsorted(glob.glob('/scratch/prabhu/backup_workstation/sunrise_holly/binned_cycles/*.fits'))
+#input_list = ['/scratch/prabhu/backup_workstation/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_21.sav','/scratch/prabhu/backup_workstation/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_22.sav']
+input_list = natsorted(glob.glob('/scratch/prabhu/backup_workstation/sunrise_holly/mean_rem_output/mean_rem_output_nr_22.fits'))
 
 for i in range (0, len(input_list)):
     fullArr = fits.open(input_list[i])
     fullArr = fullArr[0].data #0 for restored data 1 for non restored #############
-   
-    save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_' + ("_").join(input_list[i].split('_')[-2::])
-    save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_' + ("_").join(input_list[i].split('_')[-2::]) 
-
+#    fullArr = readsav(input_list[i],python_dict=True)['iid'] #iid for restored, iidn for nonrestored
+#    save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_nr_' + ("_").join(input_list[i].split('_')[-2::])
+#    save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_nr_' + ("_").join(input_list[i].split('_')[-2::]) 
+#    save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_' + input_list[i].split('_')[-1].split('.')[0]+".fits"
+#    save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_' + input_list[i].split('_')[-1].split('.')[0]+".fits"
+    if len(input_list[i].split('_'))==8:
+        save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_norm_' + input_list[i].split('_')[-1]
+        save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_norm_' + input_list[i].split('_')[-1]
+    else:
+        save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_norm_' + '_'.join(input_list[i].split('_')[-2::])
+        save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_norm_' + '_'.join(input_list[i].split('_')[-2::])
     print (save_name)
     print (save_angs)
 
