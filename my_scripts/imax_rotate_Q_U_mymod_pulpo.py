@@ -2,33 +2,42 @@ import glob
 from natsort import natsorted
 import numpy               as np
 import matplotlib.pyplot   as plt
-import matplotlib.gridspec as gridspec
+#import matplotlib.gridspec as gridspec
 
 from scipy.optimize import minimize_scalar
 from astropy.io     import fits
-from scipy.io import readsav
+#from scipy.io import readsav
 
 def Q_eq(phi):
     # Set inputs for fnction
-    sumU = 0 
-    for wv in range(0, 5):
-
-        uSing = uMes[wv]
-        qSing = qMes[wv]
-     	
-        uNew = -1 * qSing * np.sin(phi) + uSing * np.cos(phi)
-        sumU += np.square(uNew)
-
+#    sumU = 0 
+#    uNew = qMes*np.sin(2*phi) + uMes*np.cos(2*phi)
+    qNew = qMes*np.cos(2*phi) + uMes*-1*np.sin(2*phi)
+    
+    sumU = 1./np.sum(np.square(qNew))
+#    sumU = np.sum(np.square(uNew))
+#    for wv in range(0, 5):
+#
+#        uSing = uMes[wv]
+#        qSing = qMes[wv]
+#     	
+#        uNew = -1 * qSing * np.sin(2*phi) + uSing * np.cos(2*phi)
+#        sumU += np.square(uNew)
     return sumU
-
+def rotate(ang):
+    uNew1 = qMes*np.sin(2*ang) + uMes*np.cos(2*ang)
+    qNew1 = qMes*np.cos(2*ang) + uMes*-1*np.sin(2*ang)
+    
+    return qNew1,uNew1
 plot_figs = 0
 
 # Load in array
 
 #input_list = natsorted(glob.glob('/scratch/prabhu/backup_workstation/sunrise_holly/binned_cycles/*.fits'))
 #input_list = ['/scratch/prabhu/backup_workstation/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_21.sav','/scratch/prabhu/backup_workstation/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_22.sav']
-input_list = natsorted(glob.glob('/scratch/prabhu/backup_workstation/sunrise_holly/mean_rem_output/mean_rem_output_nr_22.fits'))
+input_list = natsorted(glob.glob('/scratch/prabhu/backup_workstation/sunrise_holly/mean_rem_output/mean_rem_output_nr_21.fits'))
 
+             
 for i in range (0, len(input_list)):
     fullArr = fits.open(input_list[i])
     fullArr = fullArr[0].data #0 for restored data 1 for non restored #############
@@ -38,11 +47,11 @@ for i in range (0, len(input_list)):
 #    save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_' + input_list[i].split('_')[-1].split('.')[0]+".fits"
 #    save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_' + input_list[i].split('_')[-1].split('.')[0]+".fits"
     if len(input_list[i].split('_'))==8:
-        save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_norm_' + input_list[i].split('_')[-1]
-        save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_norm_' + input_list[i].split('_')[-1]
+        save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/tr_imax_lp_max_norm_' + input_list[i].split('_')[-1]
+        save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/tr_imax_roat_angle_Q_U_norm_' + input_list[i].split('_')[-1]
     else:
-        save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_lp_max_norm_' + '_'.join(input_list[i].split('_')[-2::])
-        save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/imax_roat_angle_Q_U_norm_' + '_'.join(input_list[i].split('_')[-2::])
+        save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/tr_imax_lp_max_norm_' + '_'.join(input_list[i].split('_')[-2::])
+        save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/tr_imax_roat_angle_Q_U_norm_' + '_'.join(input_list[i].split('_')[-2::])
     print (save_name)
     print (save_angs)
 
@@ -58,14 +67,16 @@ for i in range (0, len(input_list)):
     	    
             qMes = fullArr[1, :, y, x] 
             uMes = fullArr[2, :, y, x] 
-            res = minimize_scalar(Q_eq, bounds=(0, 2*np.pi), method='bounded')
+            x11 = a[y,x]
+            res = minimize_scalar(Q_eq, bounds=(0, np.pi), method='bounded')
             angle = res['x']
             angArr[y, x] = angle
-            
-            for wv in range (0, 5):
-                uNew[wv, y, x] = -1 * fullArr[1, wv, y, x] * np.sin(angle) + fullArr[2, wv, y, x] * np.cos(angle) 
-                qNew[wv, y, x] =      fullArr[1, wv, y, x] * np.cos(angle) + fullArr[2, wv, y, x] * np.sin(angle)
-    #saving the new q and u in the same file as primary[0] and image[1] hdu's
+#            
+#            for wv in range (0, 5):
+#                uNew[wv, y, x] = -1 * fullArr[1, wv, y, x] * np.sin(angle) + fullArr[2, wv, y, x] * np.cos(angle) 
+#                qNew[wv, y, x] =      fullArr[1, wv, y, x] * np.cos(angle) + fullArr[2, wv, y, x] * np.sin(angle)
+            qNew[:,y,x],uNew[:, y, x] =  rotate(angle)  
+#saving the new q and u in the same file as primary[0] and image[1] hdu's
     hdu_ang = fits.PrimaryHDU(angArr)
     hdu_max = fits.PrimaryHDU(qNew)
     hdu_u = fits.ImageHDU(uNew,name='u')
