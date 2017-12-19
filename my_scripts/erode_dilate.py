@@ -135,8 +135,8 @@ limbmask = np.ma.masked_equal(indc[0],0).mask
 #plotting circle fitting the limb on combined LP map or continuum intensity
 fig = plt.figure(figsize=(12,12))
 ax = plt.axes()
-im=plt.imshow(smooth,cmap = 'gray',vmin=-0.01,vmax=0.01)
-#im=plt.imshow(n[0,4,:,:],cmap = 'gray',vmin=-0.01,vmax=0.01)
+#im=plt.imshow(smooth,cmap = 'gray',vmin=-0.01,vmax=0.01)
+im=plt.imshow(n[0,4,:,:],cmap = 'gray')#,vmin=-0.01,vmax=0.01)
 fig.colorbar(im)
 fig.tight_layout(pad=1.8)
 plt.plot(x_fit, y_fit, 'r-')
@@ -177,14 +177,14 @@ labels = island_lab[0]
 
 
 #plotting islands leftover after erode and dilate and pixels not on sun removed
-fig1 = plt.figure(figsize=(12,12))
-ax1 = plt.axes()
-#im1 = plt.imshow(x_wolimb,vmax=0.01,vmin=-0.01)
-plt.imshow(labels)
-#fig2.colorbar(im1)
-fig1.tight_layout(pad=1.8)
-plt.plot(x_fit, y_fit, 'k')
-plt.gca().invert_yaxis()
+#fig1 = plt.figure(figsize=(12,12))
+#ax1 = plt.axes()
+##im1 = plt.imshow(x_wolimb,vmax=0.01,vmin=-0.01)
+#plt.imshow(labels)
+##fig2.colorbar(im1)
+#fig1.tight_layout(pad=1.8)
+#plt.plot(x_fit, y_fit, 'k')
+#plt.gca().invert_yaxis()
 
 
 
@@ -198,7 +198,7 @@ fig2.tight_layout(pad=1.8)
 plt.plot(x_fit, y_fit, 'b')
 plt.gca().invert_yaxis()
 
-size,posi_size,nega_size,avglp,avglpp,avglpn,avgcv,avgcv_plp,avgcv_nlp,avgic = [[] for i in range(10)]
+size,posi_size,nega_size,avglp,avglpp,avglpn,avgcv,avgcv_plp,avgcv_nlp,avgic,ang = [[] for i in range(11)]
 
 #labels go from 1 to 967 not zero, 
 
@@ -209,7 +209,7 @@ for i in range(1,island_lab[1]+1):
     avglp.append(np.mean(combq[mk]))
     avgcv.append(np.mean(combv[mk]))
     avgic.append(np.mean(norm_ic[mk]))
-    
+    ang.append(np.mean(a[mk]))
 
 for i in range(len(size)):
     if size[i]>900 or size[i]<5:
@@ -254,53 +254,132 @@ pn = np.polyfit(nega_size,avglpn,1)
 xaxis_p = np.unique(np.sort(posi_size))
 xaxis_n = np.unique(np.sort(nega_size))
 
-plt.figure()
-plt.scatter(size,avglp,marker='.')
-plt.ylabel('Avg Linear Pol')
-plt.xlabel('Size in pixels')
-plt.plot(xaxis_p,np.polyval(pp,xaxis_p),'r')
-plt.plot(xaxis_n,np.polyval(pn,xaxis_n),'r')
+#plt.figure()
+#plt.scatter(size,avglp,marker='.')
+#plt.ylabel('Avg Linear Pol')
+#plt.xlabel('Size in pixels')
+#plt.plot(xaxis_p,np.polyval(pp,xaxis_p),'r')
+#plt.plot(xaxis_n,np.polyval(pn,xaxis_n),'r')
+#
+#plt.figure()
+#plt.scatter(size,avgcv,marker='.')
+#plt.ylabel('Avg Combined V')
+#plt.xlabel('Size in pixels')
+#
+#plt.figure()
+#plt.scatter(size,avgic,marker='.')
+#plt.ylabel('Avg Continuum intensity')
+#plt.xlabel('Size in pixels')
+#
+#plt.figure()
+#plt.scatter(avglp,avgcv,marker='.')
+#plt.ylabel('Avg combined V')
+#plt.xlabel('Average LP')
+#
+#plt.figure()
+#plt.scatter(avgic,avglp,marker='.')
+#plt.ylabel('Avg LP')
+#plt.xlabel('Avg I cont')
 
 plt.figure()
-plt.scatter(size,avgcv,marker='.')
-plt.ylabel('Avg Combined V')
-plt.xlabel('Size in pixels')
-
-plt.figure()
-plt.scatter(size,avgic,marker='.')
-plt.ylabel('Avg Continuum intensity')
-plt.xlabel('Size in pixels')
-
-plt.figure()
-plt.scatter(avglp,avgcv,marker='.')
-plt.ylabel('Avg combined V')
+plt.scatter(avglp,ang,marker='.')
+plt.ylabel('angle')
 plt.xlabel('Average LP')
 
+#n,p = [[] for i in range(2)]
+#for i in range(len(avglpp)):
+#    if avgcv_plp[i]<0:
+#        n.append(avglpp[i])
+#    else:
+#        p.append(avglpp[i])
+#    
+#plt.figure()
+#plt.hist([p,n],200,color=['r','k'])
+#plt.xlabel('avg LP of islands, red for patches with +ve Combined V and black for -ve CV ')
+#
+#del p,n
+#
+#n,p = [[] for i in range(2)]
+#for i in range(len(avglpn)):
+#    if avgcv_nlp[i]<0:
+#        n.append(avglpn[i])
+#    else:
+#        p.append(avglpn[i])
+#plt.figure()
+#plt.hist([p,n],200,color=['r','k'])        
+#plt.xlabel('avg LP of islands, red for patches with +ve Combined V and black for -ve CV ')
+
+#%%
+
+#pr[0][0] and pr[0][1] are hists for posi and nega arrays and pr[1] is the bins for them
+pr= plt.hist([posi_size,nega_size],bins = 100)
+#centre points of bins
+bcp = 0.5*(pr[1][1:]+pr[1][:-1])
+
 plt.figure()
-plt.scatter(avgic,avglp,marker='.')
-plt.ylabel('Avg LP')
-plt.xlabel('Avg I cont')
+plt.plot(bcp,pr[0][0],'r-')
+plt.plot(bcp,pr[0][1],'b-')
 
 
-n,p = [[] for i in range(2)]
-for i in range(len(avglpp)):
-    if avgcv_plp[i]<0:
-        n.append(avglpp[i])
-    else:
-        p.append(avglpp[i])
-    
+#separating islands for positive and negative LP signal
+
+yp = np.ma.greater(smooth,2*std_smooth).astype(int)
+
+yn = np.ma.less(smooth,-2*std_smooth).astype(int)
+
+
+le_p = erode(yp,structure=np.ones((3,3))).astype(x.dtype)
+le_n = erode(yn,structure=np.ones((3,3))).astype(x.dtype)
+dil_p = dilate(le_p,structure=[[True,True,True],[True,True,True],[True,True,True]]).astype(le_p.dtype)
+dil_n = dilate(le_n,structure=[[True,True,True],[True,True,True],[True,True,True]]).astype(le_n.dtype)
+
+le_p_wolimb = np.ma.array(dil_p,mask=limbmask)
+le_n_wolimb = np.ma.array(dil_n,mask=limbmask)
+np.ma.set_fill_value(le_p_wolimb,0.0)
+np.ma.set_fill_value(le_n_wolimb,0.0)
+
+fig3 = plt.figure(figsize=(12,12))
+ax3 = plt.axes()
+im3 = plt.imshow(combq,vmax=0.01,vmin=-0.01)
+im3_1 = plt.contour(le_p_wolimb,levels,origin='lower',colors = 'r')
+fig3.colorbar(im3)
+fig3.tight_layout(pad=1.8)
+plt.plot(x_fit, y_fit, 'b')
+plt.gca().invert_yaxis()
+
+#labeling islands leftover from erode and dilate without off limb pixels
+island_lab_p = measurements.label(le_p_wolimb.filled())
+island_lab_n = measurements.label(le_n_wolimb.filled())
+labels_p = island_lab_p[0]
+labels_n = island_lab_n[0]
+
+avgq_p1,avgq_p3,avgq_n1,avgq_n3,sizep,sizen,angp,angn = [[] for i in range(8)]
+
+for i in range(1,island_lab_p[1]+1):
+    mkp = np.ma.masked_equal(labels_p,i).mask
+    sizep.append(labels_p[labels_p==i].shape[0])
+    avgq_p1.append(np.mean(n[1,1,:,:][mkp]))
+    avgq_p3.append(np.mean(n[1,3,:,:][mkp]))
+    angp.append(np.median(a[mkp]))
+
+for i in range(1,island_lab_n[1]+1):
+    mkn = np.ma.masked_equal(labels_n,i).mask
+    sizen.append(labels_n[labels_n==i].shape[0])
+    avgq_n1.append(np.mean(n[1,1,:,:][mkn]))
+    avgq_n3.append(np.mean(n[1,3,:,:][mkn]))    
+    angn.append(np.median(a[mkn]))
+
 plt.figure()
-plt.hist([p,n],200,color=['r','k'])
-plt.xlabel('avg LP of islands, red for patches with +ve Combined V and black for -ve CV ')
+plt.scatter(sizep,avgq_p1,marker='.')
+plt.ylabel('Avg Q, wv 1,posi')
+plt.xlabel('Size')
 
-del p,n
 
-n,p = [[] for i in range(2)]
-for i in range(len(avglpn)):
-    if avgcv_nlp[i]<0:
-        n.append(avglpn[i])
-    else:
-        p.append(avglpn[i])
 plt.figure()
-plt.hist([p,n],200,color=['r','k'])        
-plt.xlabel('avg LP of islands, red for patches with +ve Combined V and black for -ve CV ')
+plt.scatter(sizen,avgq_n1,marker='.')
+plt.ylabel('Avg Q, wv 1, nega')
+plt.xlabel('Size')
+
+
+
+
