@@ -63,7 +63,7 @@ no_slices = 12
 # Get data
 
 #files = glob.glob('../Data/post_demod_*.fits')
-files = ['/home/prabhu/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_22.sav']
+files = ['/home/prabhu/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_21.sav']
 
 #for f in files:
 for i in range(0, 1):
@@ -71,12 +71,12 @@ for i in range(0, 1):
     split_f = f.split('_')
 
 #    save_name = '../Data/normalised_output_test_' + split_f[3][0:2] + '.fits'
-    save_name = '/home/prabhu/sunrise_holly/normalize_mu_output/normalize_mu_22.fits'
+    save_name = '/home/prabhu/sunrise_holly/normalize_mu_output/normalize_mu_21.fits'
 
     print (save_name)
 
 #    res = fits.open(f)
-    res = readsav(f,python_dict = True)['iid']
+    res = readsav(f,python_dict = True)['iidn']
 #    res = res[0].data
     
     I_cont = np.copy(res[0, 4, :, :])
@@ -144,15 +144,16 @@ for i in range(0, 1):
     polyFit = np.polyfit(cenAn, mean_list, 6)
     
     fit_fn  = np.poly1d(polyFit)
-    
-    # Normalise the data
-    
+#    
+#    # Normalise the data
+#    
     res_copy = np.copy(res)
     
     norm_arr = fit_fn(mu_copy)
     
     norm_arr[mu_copy == 0] = np.min(norm_arr)
-    
+    xax = np.linspace(cenAn[0], cenAn[no_slices-1], 100)
+#    
     for stok in range (0, 4):
     
         for wvln in range(0, 5):
@@ -214,8 +215,8 @@ for i in range(0, 1):
     
     # Save corrected data
     
-    hdu = fits.PrimaryHDU(res)
-    
-    hdu.writeto(save_name)
+#    hdu = fits.PrimaryHDU(res)
+#    
+#    hdu.writeto(save_name)
     
     

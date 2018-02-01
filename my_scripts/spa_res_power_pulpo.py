@@ -88,7 +88,7 @@ y = x.T
 
 #estimating the distance of each element of the x and y array from the centre,
 #to get an array of distances, to then estimate equi distant points for the cirlce
-distances = np.sqrt((x-467.5)**2+(y-467.5)**2)
+distances = np.sqrt((x**2+(y)**2)
 # rounding them up as distances
 distances2 = np.around(distances)
 
