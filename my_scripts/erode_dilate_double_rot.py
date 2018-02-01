@@ -93,7 +93,12 @@ for j in range(dim[0]):
             combu[j,i] = uMes
             angA[j,i] = a[j,i]
             
-
+a_copy = np.copy(angA*180/np.pi)
+for j in range(a_copy.shape[0]):
+    for i in range(a_copy.shape[0]):
+        if a_copy[j,i]>180:
+            a_copy[j,i]= a_copy[j,i]-180
+            
 norm_q = n[1,:,:,:]
 ncombq = np.sum(norm_q[0:-1],axis=0)
 
@@ -191,12 +196,13 @@ polyFit = np.polyfit(cenAn, mean_list, 6)
 fit_fn  = np.poly1d(polyFit)
 
 xax = np.linspace(cenAn[0], cenAn[no_slices-1], 100)
+plt.figure()
 plt.plot(xax, fit_fn(xax))
 
 thres = fit_fn(mu_copy)
 del smooth
 smooth = convolve(combq,kernel,mode='constant') 
-smooth[smooth<(3*thres)]=90000 
+smooth[smooth<(sig*thres)]=90000 
 ############
 x_fit = xCen + (radSun) * np.cos(theta_fit)
 y_fit = yCen + (radSun) * np.sin(theta_fit)
@@ -285,7 +291,7 @@ plt.plot(x_fit, y_fit, 'b')
 plt.gca().invert_yaxis()
 plt.suptitle('Combined V')
 
-size,psize,nsize,avglp,avglpp,avglpn,avgcv,avgic,ang,tlp,tcv,stda= [[] for i in range(12)]
+size,psize,nsize,avglp,avgcv,avgic,ang,tlp,tcv,stda,angh= [[] for i in range(11)]
 
 #labels go from 1 to 967 not zero, 
 
@@ -295,8 +301,8 @@ for i in range(1,island_lab[1]+1):
     avglp.append(np.mean(combq[mk]))
     avgcv.append(np.mean(combv[mk]))
     avgic.append(np.mean(norm_ic[mk]))
-    ang.append(np.median(angA[mk]))
-    stda.append(np.std(angA[mk]))
+    ang.append(np.median(a_copy[mk]))
+    stda.append(np.std(a_copy[mk]))
     tlp.append(np.sum(combq[mk]))
     tcv.append(np.sum(combv[mk]))
 #
@@ -315,13 +321,14 @@ for i in range(len(size)):
 '''PLots that are important namely :
 - size vs angle with mean
 - size vs angle with hist
+- histogram of angles 
 - size vs average linear polarisation 
 - size vs total linear polarisation
 '''
 
 stdb = np.array(stda)*50
 plt.figure()        
-plt.scatter(size,np.array(ang)*180/np.pi)#,s=stdb)
+plt.scatter(size,ang)#,s=stdb)
 plt.xlabel('Size')
 plt.ylabel('Angle')
 plt.suptitle('Size vs Angle (angle mean)')
@@ -333,20 +340,16 @@ plt.ylabel('Std')
 plt.suptitle('Size vs std of Angle')
 
 
-angh = []
-a_deg = angA*180/np.pi
-for i in range(1,island_lab[1]+1):
-    mk = np.ma.masked_equal(labels,i).mask
-    no,bin_edge = np.histogram(a_deg[mk],bins=10)
-    bincen = 0.5*(bin_edge[1:]+bin_edge[:-1])
-    angh.append(np.mean(bincen[no==np.max(no)]))
 
-   
-plt.figure()        
-plt.scatter(size,angh,s=stdb)
-plt.xlabel('Size')
-plt.ylabel('Angle')
-plt.suptitle('Size vs Angle (angle with hist)')
+
+
+a_hist = list(a_copy.reshape([1,-1]))
+plt.figure()
+plt.hist(a_hist,bins = 100)
+plt.xlabel('Angle')
+plt.suptitle('Histogram of angles')
+
+
 
 #fitting trend to absolute value of LP,
 #already attempted a trend line separately
@@ -361,11 +364,11 @@ xaxis = np.unique(np.sort(size_won))
 
 
 plt.figure()
-plt.scatter(size_won,np.abs(avglp_won),marker='.')
+plt.scatter(size_won,avglp_won,marker='.')
 plt.ylabel('Avg Linear Pol')
 plt.xlabel('Size in pixels')
 plt.plot(xaxis,np.polyval(polyp1,xaxis),'r')
-plt.ylim([0.0029,0.008])
+#plt.ylim([0.0029,0.008])
 plt.suptitle('size vs ALP')
 
 plt.figure()
@@ -400,9 +403,12 @@ plt.suptitle('ALP vs ACV')
 #
 
 
+            
+            
+
 fig3 = plt.figure(figsize=(12,12))
 ax3 = plt.axes()
-im3 = plt.imshow(angA*180/np.pi,cmap=cmocean.cm.phase)
+im3 = plt.imshow(a_copy,cmap = cmocean.cm.phase)
 im3_1 = plt.contour(le_wolimb,levels,origin='lower',colors = 'k')
 fig3.colorbar(im3)
 fig3.tight_layout(pad=1.8)
@@ -424,5 +430,43 @@ plt.scatter(size,tcv,marker='.')
 plt.ylabel('total combined V')
 plt.xlabel('size')
 plt.suptitle('Size vs TCV')
+
+#%%
+
+##DEBUG###
+ind = []
+for i in range(len(avglp)):
+    if avglp[i]>0.0068:
+        ind.append(i+1)
+
+w = np.copy(labels)
+for i in ind:
+    w[w==i]=900000000
+    
+plt.figure(figsize=(12,12))
+plt.imshow(w)
+plt.colorbar()
+plt.tight_layout(pad=1.8)
+plt.plot(x_fit, y_fit, 'b')
+plt.gca().invert_yaxis()
+ind.pop()
+ind.pop()
+for i in ind:
+    avglp[i-1]=np.nan
+    size[i-1]=np.nan
+size_won = list(filter(lambda x:not(np.isnan(x)),size)) #removing nans, polyfit doesnt like them much
+avglp_won = list(filter(lambda x:not(np.isnan(x)),avglp))
+tlp_won = list(filter(lambda x:not(np.isnan(x)),tlp))
+#polyp1 = np.polyfit(size_won,np.abs(avglp_won),1)
+#polyp2 = np.polyfit(size_won,np.abs(tlp_won),1)
+xaxis = np.unique(np.sort(size_won))
+
+plt.figure()
+plt.scatter(size_won,avglp_won,marker='.')
+plt.ylabel('Avg Linear Pol')
+plt.xlabel('Size in pixels')
+plt.plot(xaxis,np.polyval(polyp1,xaxis),'r')
+#plt.ylim([0.0029,0.008])
+plt.suptitle('size vs ALP')
 
 
