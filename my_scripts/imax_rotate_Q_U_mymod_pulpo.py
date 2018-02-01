@@ -11,11 +11,11 @@ from astropy.io     import fits
 def Q_eq(phi):
     # Set inputs for fnction
 #    sumU = 0 
-#    uNew = qMes*np.sin(2*phi) + uMes*np.cos(2*phi)
-    qNew = qMes*np.cos(2*phi) + uMes*-1*np.sin(2*phi)
+    uNew = qMes*np.sin(2*phi) + uMes*np.cos(2*phi)
+   # qNew = qMes*np.cos(2*phi) + uMes*-1*np.sin(2*phi)
     
-    sumU = 1./np.sum(np.square(qNew))
-#    sumU = np.sum(np.square(uNew))
+   
+    sumU = np.sum(np.square(uNew))
 #    for wv in range(0, 5):
 #
 #        uSing = uMes[wv]
@@ -67,7 +67,6 @@ for i in range (0, len(input_list)):
     	    
             qMes = fullArr[1, :, y, x] 
             uMes = fullArr[2, :, y, x] 
-            x11 = a[y,x]
             res = minimize_scalar(Q_eq, bounds=(0, np.pi), method='bounded')
             angle = res['x']
             angArr[y, x] = angle

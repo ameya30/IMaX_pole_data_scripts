@@ -13,11 +13,13 @@ import cmocean
 import numpy as np
 
 from astropy.io import fits
-
+from matplotlib import pyplot as plt
+from scipy.io import readsav
 from scipy.ndimage.morphology import binary_dilation as dilate
 from scipy.ndimage.morphology import binary_erosion as erode
 from scipy.ndimage import measurements 
 from scipy.ndimage import convolve
+from scipy.ndimage.morphology import binary_dilation as dilate
 
 
 
@@ -42,6 +44,7 @@ def rotate(ang):
     qNew1 = qMes*np.cos(2*ang) + uMes*-1*np.sin(2*ang)
     
     return qNew1,uNew1
+
 
 cdict = {'red': ((0.0,  0.50, 0.50),
                   (1.0,  1.0, 1.0)),
@@ -78,6 +81,8 @@ elif fac == 5:
     kernel[4,:] = 0.25/16
     kernel[1:4,0] = 0.25/16
     kernel[1:4,4] = 0.25/16
+
+
 
 
 cy = input("Choose cycle: ")
@@ -120,17 +125,19 @@ combq = np.empty(shape=(dim[0],dim[1]))
 angA = np.empty(shape=(dim[0],dim[1]))
 
 
+
 ###########
 xCen = -1044.9200117954174
 yCen = 16862.994425535013
 radSun = 16767.565720491271
 
 smooth = combu_p
+
 dimRes = np.shape(smooth)
 no_slices = 12
 mu_arr = np.zeros(shape = (dimRes[0], dimRes[1]))
 
-#    mu_arr = np.flipud(mu_arr)
+
 
 for y in range(0, dimRes[0]):
 
@@ -140,7 +147,9 @@ for y in range(0, dimRes[0]):
 # Crop arrays so edge effects don't affect normalisation
 
 mu_copy = np.copy(mu_arr)
+
 c = 120
+
 mu_arr = mu_arr[c : 936-c, c : 936-c]
 smooth = smooth[c : 936-c, c : 936-c]
 
@@ -151,8 +160,6 @@ range_mu = np.max(mu_arr) - np.min(mu_arr)
 step = range_mu / no_slices 
 
 mean_list = np.empty(no_slices)
-
-
 
 smooth_copy = np.copy(smooth)
 
@@ -247,12 +254,51 @@ combv = norm_v[0,:,:] + norm_v[1,:,:] - norm_v[2,:,:] - norm_v[3,:,:]
 
 
 #with inflection from find_limb and that as input to my mod of imax_find_sun
-#theta_fit = np.linspace(-np.pi/2+np.pi/52.025,-np.pi/2+np.pi/26.5, 1800)
 theta_fit = np.linspace(-np.pi/2+np.pi/50.025,-np.pi/2+np.pi/26.7, 1800)
 xCen = -1044.9200117954174
 yCen = 16862.994425535013
 radSun = 16767.565720491271
 
+
+
+
+
+for j in range(dim[0]):
+    for i in range(dim[1]):
+        qMes = combq_p[j,i]
+        uMes = combu_p[j,i]
+        if qMes<0:
+            combq[j,i],combu[j,i] = rotate(np.pi/2)
+            angA[j,i]=a[j,i]+np.pi/2
+        else:
+            combq[j,i] = qMes
+            combu[j,i] = uMes
+            angA[j,i] = a[j,i]
+            
+a_copy = np.copy(angA*180/np.pi)
+for j in range(a_copy.shape[0]):
+    for i in range(a_copy.shape[0]):
+        if a_copy[j,i]>180:
+            a_copy[j,i]= a_copy[j,i]-180
+
+
+            
+norm_q = n[1,:,:,:]
+ncombq = np.sum(norm_q[0:-1],axis=0)
+
+dim = q.shape
+norm_v = n[3,:,:,:]
+norm_ic =n[0,4,:,:]
+combv = norm_v[0,:,:] + norm_v[1,:,:] - norm_v[2,:,:] - norm_v[3,:,:]
+
+kernel= np.ones((3,3))
+kernel[1,1] = 0.5
+kernel[0,:] = 0.5/8
+kernel[2,:] = 0.5/8
+kernel[1,0] = 0.5/8
+kernel[1,2] = 0.5/8
+#
+smooth = convolve(combq,kernel,mode='constant') 
 
 thres = fit_fn(mu_copy)
 del smooth
@@ -743,15 +789,6 @@ plt.tight_layout()
 #plt.ylabel('Number of pixels')
 #plt.tight_layout()
 #plt.savefig('lab_c5_noiseU_sig2.5.png')
-
-
-
-
-
-
-
-
-
 
 
 
