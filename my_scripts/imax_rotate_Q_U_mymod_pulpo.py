@@ -50,8 +50,8 @@ for i in range (0, len(input_list)):
         save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/tr_imax_lp_max_norm_' + input_list[i].split('_')[-1]
         save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/tr_imax_roat_angle_Q_U_norm_' + input_list[i].split('_')[-1]
     else:
-        save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/btr_imax_lp_max_norm_' + '_'.join(input_list[i].split('_')[-2::])
-        save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/btr_imax_roat_angle_Q_U_norm_' + '_'.join(input_list[i].split('_')[-2::])
+        save_name = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/tr_imax_lp_max_norm_' + '_'.join(input_list[i].split('_')[-2::])
+        save_angs = '/scratch/prabhu/backup_workstation/sunrise_holly/imax_lp_max_/tr_imax_roat_angle_Q_U_norm_' + '_'.join(input_list[i].split('_')[-2::])
     print (save_name)
     print (save_angs)
 

@@ -12,7 +12,9 @@ from astropy.io import fits
 from matplotlib import pyplot as plt
 from scipy.io import readsav
 from scipy.ndimage.morphology import binary_dilation as dilate
-
+from scipy.fftpack import fft2,fftshift,ifft2,ifftshift
+import scipy.fftpack as fp
+from scipy import signal
 from scipy.ndimage.morphology import binary_erosion as erode
 from scipy.ndimage import measurements 
 
@@ -39,7 +41,7 @@ def rotate(ang):
     
     return qNew1,uNew1
 
-sig = 3
+sig = 3.5
 
 cy = input("Choose cycle: ")
 
@@ -79,6 +81,87 @@ combu = np.empty(shape=(dim[0],dim[1]))
 combq = np.empty(shape=(dim[0],dim[1]))
 angA = np.empty(shape=(dim[0],dim[1]))
 
+kernel= np.ones((3,3))
+kernel[1,1] = 0.5
+kernel[0,:] = 0.5/8
+kernel[2,:] = 0.5/8
+kernel[1,0] = 0.5/8
+kernel[1,2] = 0.5/8
+#
+smooth = convolve(combu_p,kernel,mode='constant')
+dimRes = np.shape(smooth)
+no_slices = 12
+mu_arr = np.zeros(shape = (dimRes[0], dimRes[1]))
+
+#    mu_arr = np.flipud(mu_arr)
+
+for y in range(0, dimRes[0]):
+
+    for x in range(0, dimRes[1]):
+        mu_arr[y,x] = find_mu(y,x)
+
+# Crop arrays so edge effects don't affect normalisation
+
+mu_copy = np.copy(mu_arr)
+c=120
+mu_arr = mu_arr[c : 936-c, c : 936-c]
+smooth = smooth[c : 936-c, c : 936-c]
+
+# Take average of the mu slices 
+
+range_mu = np.max(mu_arr) - np.min(mu_arr)
+
+step = range_mu / no_slices 
+
+mean_list = np.empty(no_slices)
+
+
+
+smooth_copy = np.copy(smooth)
+
+for i in range (0, no_slices):
+
+    edge1 = i * step
+    edge2 = edge1 + step
+    smooth[mu_arr <= edge1] = 0
+    smooth[mu_arr >  edge2] = 0
+    rr = smooth[smooth != 0]
+    m = np.mean(rr)
+    s = np.std(rr)
+    nr = rr[(rr>(m+3*s)) | (rr<(m-3*s))]
+    while nr.shape[0]:
+        m = np.mean(rr)
+        s = np.std(rr)
+        nr = rr[(rr>(m+3*s)) | (rr<(m-3*s))]
+        rr = rr[(rr<(m+3*s)) & (rr>(m-3*s))]
+    mean_list[i] = s  
+    smooth = np.copy(smooth_copy)
+
+# Find center of slices
+
+cenAn = np.empty(no_slices)
+
+for i in range(0, no_slices):
+   edge1 = i * step
+
+   if i == no_slices-1:
+       edge2 = np.max(mu_copy) + 0.000001
+   else:
+       edge2 = edge1 + step
+
+   cenAn[i] = np.mean([edge1, edge2])
+
+# Find curve of normalistion
+
+polyFit = np.polyfit(cenAn, mean_list, 3)
+
+fit_fn  = np.poly1d(polyFit)
+
+xax = np.linspace(cenAn[0], cenAn[no_slices-1], 100)
+plt.figure()
+plt.plot(xax, fit_fn(xax))
+
+
 
 
 for j in range(dim[0]):
@@ -98,6 +181,8 @@ for j in range(a_copy.shape[0]):
     for i in range(a_copy.shape[0]):
         if a_copy[j,i]>180:
             a_copy[j,i]= a_copy[j,i]-180
+
+
             
 norm_q = n[1,:,:,:]
 ncombq = np.sum(norm_q[0:-1],axis=0)
@@ -127,77 +212,77 @@ xCen = -1044.9200117954174
 yCen = 16862.994425535013
 radSun = 16767.565720491271
 ###########
-dimRes = np.shape(smooth)
-no_slices = 12   
-mu_arr = np.zeros(shape = (dimRes[0], dimRes[1]))
-
-#    mu_arr = np.flipud(mu_arr)
-
-for y in range(0, dimRes[0]):
-
-    for x in range(0, dimRes[1]):
-        mu_arr[y,x] = find_mu(y,x)
-
-# Crop arrays so edge effects don't affect normalisation
-
-mu_copy = np.copy(mu_arr)
-
-mu_arr = mu_arr[80 : 936-80, 80 : 936-80]
-smooth = smooth[80 : 936-80, 80 : 936-80]
-
-# Take average of the mu slices 
-
-range_mu = np.max(mu_arr) - np.min(mu_arr)
-
-step = range_mu / no_slices 
-
-mean_list = np.empty(no_slices)
-
-smooth_copy = np.copy(smooth)
-
-for i in range (0, no_slices):
-
-    edge1 = i * step
-    edge2 = edge1 + step
-
-    smooth[mu_arr <= edge1] = 0
-    smooth[mu_arr >  edge2] = 0
-    s = np.std(smooth)
-    rr = smooth[smooth != 0]
-    m = np.mean(rr)
-    s = np.std(rr)
-    nr = rr[rr>(m+3*s)]
-    while nr.shape[0]:
-        m = np.mean(rr)
-        s = np.std(rr)
-        nr = rr[rr>(m+3*s)]
-        rr = rr[rr<(m+3*s)]
-    mean_list[i] = s  
-    smooth = np.copy(smooth_copy)
-
-# Find center of slices
-
-cenAn = np.empty(no_slices)
-
-for i in range(0, no_slices):
-   edge1 = i * step
-
-   if i == no_slices-1:
-       edge2 = np.max(mu_copy) + 0.000001
-   else:
-       edge2 = edge1 + step
-
-   cenAn[i] = np.mean([edge1, edge2])
-
-# Find curve of normalistion
-
-polyFit = np.polyfit(cenAn, mean_list, 6)
-
-fit_fn  = np.poly1d(polyFit)
-
-xax = np.linspace(cenAn[0], cenAn[no_slices-1], 100)
-plt.figure()
-plt.plot(xax, fit_fn(xax))
+#dimRes = np.shape(smooth)
+#no_slices = 12
+#mu_arr = np.zeros(shape = (dimRes[0], dimRes[1]))
+#
+##    mu_arr = np.flipud(mu_arr)
+#
+#for y in range(0, dimRes[0]):
+#
+#    for x in range(0, dimRes[1]):
+#        mu_arr[y,x] = find_mu(y,x)
+#
+## Crop arrays so edge effects don't affect normalisation
+#
+#mu_copy = np.copy(mu_arr)
+#c=120
+#mu_arr = mu_arr[c : 936-c, c : 936-c]
+#smooth = smooth[c : 936-c, c : 936-c]
+#
+## Take average of the mu slices 
+#
+#range_mu = np.max(mu_arr) - np.min(mu_arr)
+#
+#step = range_mu / no_slices 
+#
+#mean_list = np.empty(no_slices)
+#
+#
+#
+#smooth_copy = np.copy(smooth)
+#
+#for i in range (0, no_slices):
+#
+#    edge1 = i * step
+#    edge2 = edge1 + step
+#    smooth[mu_arr <= edge1] = 0
+#    smooth[mu_arr >  edge2] = 0
+#    rr = smooth[smooth != 0]
+#    m = np.mean(rr)
+#    s = np.std(rr)
+#    nr = rr[rr>(m+3*s)]
+#    while nr.shape[0]:
+#        m = np.mean(rr)
+#        s = np.std(rr)
+#        nr = rr[rr>(m+3*s)]
+#        rr = rr[rr<(m+3*s)]
+#    mean_list[i] = s  
+#    smooth = np.copy(smooth_copy)
+#
+## Find center of slices
+#
+#cenAn = np.empty(no_slices)
+#
+#for i in range(0, no_slices):
+#   edge1 = i * step
+#
+#   if i == no_slices-1:
+#       edge2 = np.max(mu_copy) + 0.000001
+#   else:
+#       edge2 = edge1 + step
+#
+#   cenAn[i] = np.mean([edge1, edge2])
+#
+## Find curve of normalistion
+#
+#polyFit = np.polyfit(cenAn, mean_list, 3)
+#
+#fit_fn  = np.poly1d(polyFit)
+#
+#xax = np.linspace(cenAn[0], cenAn[no_slices-1], 100)
+#plt.figure()
+#plt.plot(xax, fit_fn(xax))
 
 thres = fit_fn(mu_copy)
 del smooth
@@ -302,20 +387,22 @@ for i in range(1,island_lab[1]+1):
     avgcv.append(np.mean(combv[mk]))
     avgic.append(np.mean(norm_ic[mk]))
     ang.append(np.median(a_copy[mk]))
+    angh.append(a_copy[mk])
     stda.append(np.std(a_copy[mk]))
     tlp.append(np.sum(combq[mk]))
     tcv.append(np.sum(combv[mk]))
 #
-for i in range(len(size)):
-    if size[i]>700 or size[i]<5:
-        size[i] = np.nan
-        avglp[i] = np.nan
-        avgcv[i] = np.nan
-        avgic[i] = np.nan
-        ang[i] = np.nan
-        stda[i] = np.nan
-        tlp[i] = np.nan
-        tcv[i] = np.nan
+#for i in range(len(size)):
+#    if size[i]>700 or size[i]<5:
+#        size[i] = np.nan
+#        avglp[i] = np.nan
+#        avgcv[i] = np.nan
+#        avgic[i] = np.nan
+#        ang[i] = np.nan
+#        angh[i]= np.nan
+#        stda[i] = np.nan
+#        tlp[i] = np.nan
+#        tcv[i] = np.nan
 #%%
 
 '''PLots that are important namely :
@@ -343,7 +430,8 @@ plt.suptitle('Size vs std of Angle')
 
 
 
-a_hist = list(a_copy.reshape([1,-1]))
+#a_hist = list(a_copy.reshape([1,-1]))
+a_hist = np.concatenate(np.array(angh))
 plt.figure()
 plt.hist(a_hist,bins = 100)
 plt.xlabel('Angle')
@@ -468,5 +556,4 @@ plt.xlabel('Size in pixels')
 plt.plot(xaxis,np.polyval(polyp1,xaxis),'r')
 #plt.ylim([0.0029,0.008])
 plt.suptitle('size vs ALP')
-
-
+#%%

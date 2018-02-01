@@ -63,7 +63,7 @@ no_slices = 12
 # Get data
 
 #files = glob.glob('../Data/post_demod_*.fits')
-files = ['/home/prabhu/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_22.sav']
+files = ['/home/prabhu/sunrise_holly/movie_data/mk_magneto_tr2_reduc_rnr_300_21.sav']
 
 #for f in files:
 for i in range(0, 1):
@@ -71,7 +71,7 @@ for i in range(0, 1):
     split_f = f.split('_')
 
 #    save_name = '../Data/normalised_output_test_' + split_f[3][0:2] + '.fits'
-    save_name = '/home/prabhu/sunrise_holly/normalize_mu_output/normalize_mu_22.fits'
+    save_name = '/home/prabhu/sunrise_holly/normalize_mu_output/normalize_mu_21.fits'
 
     print (save_name)
 
@@ -214,8 +214,8 @@ for i in range(0, 1):
     
     # Save corrected data
     
-    hdu = fits.PrimaryHDU(res)
-    
-    hdu.writeto(save_name)
+#    hdu = fits.PrimaryHDU(res)
+#    
+#    hdu.writeto(save_name)
     
     
